@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Ruby::Lsp::Herb do
+RSpec.describe RubyLsp::Herb do
   it "has a version number" do
-    expect(Ruby::Lsp::Herb::VERSION).not_to be nil
+    expect(RubyLsp::Herb::VERSION).not_to be_nil
   end
 
   it "does something useful" do

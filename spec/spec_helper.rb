@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "ruby/lsp/herb"
+require "ruby_lsp/herb"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

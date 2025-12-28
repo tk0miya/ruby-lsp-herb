@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/ruby/lsp/herb/version"
+require_relative "lib/ruby_lsp/herb/version"
 
 Gem::Specification.new do |spec|
   spec.name = "ruby-lsp-herb"
-  spec.version = Ruby::Lsp::Herb::VERSION
+  spec.version = RubyLsp::Herb::VERSION
   spec.authors = ["Takeshi KOMIYA"]
   spec.email = ["i.tkomiya@gmail.com"]
 
