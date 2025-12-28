@@ -1,0 +1,17 @@
+# Generated from lib/ruby_lsp/herb/addon.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    class Addon < ::RubyLsp::Addon
+      # @rbs global_state: GlobalState
+      # @rbs message_queue: Thread::Queue
+      def activate: (GlobalState global_state, Thread::Queue message_queue) -> void
+
+      def deactivate: () -> void
+
+      def name: () -> String
+
+      def version: () -> String
+    end
+  end
+end

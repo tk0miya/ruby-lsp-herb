@@ -1,0 +1,8 @@
+module RubyLsp
+  class Addon
+  end
+
+  class GlobalState
+    attr_reader workspace_path: String
+  end
+end
