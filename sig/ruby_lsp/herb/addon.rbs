@@ -3,6 +3,10 @@
 module RubyLsp
   module Herb
     class Addon < ::RubyLsp::Addon
+      attr_reader global_state: GlobalState
+
+      attr_reader logger: Logger
+
       # @rbs global_state: GlobalState
       # @rbs message_queue: Thread::Queue
       def activate: (GlobalState global_state, Thread::Queue message_queue) -> void
