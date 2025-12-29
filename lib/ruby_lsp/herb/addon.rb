@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "ruby_lsp/addon"
+require_relative "../herb"
 
 module RubyLsp
   module Herb

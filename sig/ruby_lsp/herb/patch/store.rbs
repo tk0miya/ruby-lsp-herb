@@ -1,0 +1,10 @@
+# Generated from lib/ruby_lsp/herb/patch/store.rb with RBS::Inline
+
+module RubyLsp
+  class Store
+    alias original_set set
+
+    # @rbs override
+    def set: ...
+  end
+end

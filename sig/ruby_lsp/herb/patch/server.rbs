@@ -1,0 +1,10 @@
+# Generated from lib/ruby_lsp/herb/patch/server.rb with RBS::Inline
+
+module RubyLsp
+  class Server < BaseServer
+    alias original_text_document_diagnostic text_document_diagnostic
+
+    # @rbs override
+    def text_document_diagnostic: ...
+  end
+end

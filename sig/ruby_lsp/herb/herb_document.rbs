@@ -1,0 +1,9 @@
+# Generated from lib/ruby_lsp/herb/herb_document.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    # @rbs generic T
+    class HerbDocument[T] < RubyLsp::ERBDocument[T]
+    end
+  end
+end

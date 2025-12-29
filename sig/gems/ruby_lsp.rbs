@@ -2,7 +2,21 @@ module RubyLsp
   class Addon
   end
 
+  class Document[T]
+    def initialize: (source: String, version: Integer, uri: URI::Generic, global_state: GlobalState) -> void
+  end
+
+  class ERBDocument[T] < Document[T]
+  end
+
   class GlobalState
     attr_reader workspace_path: String
+  end
+
+  class Store
+    @global_state: GlobalState
+    @state: Hash[URI::Generic, Document[untyped]]
+
+    def set: (uri: URI::Generic, source: String, version: Integer, language_id: Symbol) -> Document[untyped]
   end
 end
