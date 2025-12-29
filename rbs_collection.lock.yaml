@@ -57,6 +57,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: dbm
+  version: '0'
+  source:
+    type: stdlib
 - name: diff-lcs
   version: '1.5'
   source:
@@ -85,6 +89,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: herb
+  version: 0.8.6
+  source:
+    type: rubygems
 - name: i18n
   version: '1.10'
   source:
@@ -165,6 +173,14 @@ gems:
   version: 1.7.0
   source:
     type: rubygems
+- name: pstore
+  version: '0'
+  source:
+    type: stdlib
+- name: psych
+  version: '0'
+  source:
+    type: stdlib
 - name: rainbow
   version: '3.0'
   source:

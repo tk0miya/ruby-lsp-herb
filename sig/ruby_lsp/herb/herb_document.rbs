@@ -4,6 +4,11 @@ module RubyLsp
   module Herb
     # @rbs generic T
     class HerbDocument[T] < RubyLsp::ERBDocument[T]
+      attr_reader parse_result: ::Herb::ParseResult
+
+      def parse!: () -> void
+
+      def syntax_error?: () -> bool
     end
   end
 end

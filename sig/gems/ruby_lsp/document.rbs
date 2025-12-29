@@ -1,5 +1,9 @@
 module RubyLsp
   class Document[T]
+    @needs_parsing: bool
+
+    attr_reader source: String
+
     def initialize: (source: String, version: Integer, uri: URI::Generic, global_state: GlobalState) -> void
   end
 
