@@ -1,0 +1,11 @@
+module RubyLsp
+  class Document[T]
+    def initialize: (source: String, version: Integer, uri: URI::Generic, global_state: GlobalState) -> void
+  end
+
+  class ERBDocument[T] < Document[T]
+  end
+
+  class RubyDocument[T] < Document[T]
+  end
+end

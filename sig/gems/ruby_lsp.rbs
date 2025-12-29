@@ -1,21 +1,26 @@
 module RubyLsp
+  module Interface = LanguageServer::Protocol::Interface
+  module Constant = LanguageServer::Protocol::Constant
+
   class Addon
   end
 
-  class Document[T]
-    def initialize: (source: String, version: Integer, uri: URI::Generic, global_state: GlobalState) -> void
-  end
-
-  class ERBDocument[T] < Document[T]
+  class BaseServer
+    def send_message: (untyped message) -> void
+    def send_empty_response: (Integer id) -> void
   end
 
   class GlobalState
     attr_reader workspace_path: String
   end
 
+  class Server < BaseServer
+    def text_document_diagnostic: (Hash[untyped, untyped]) -> void
+  end
+
   class Store
     @global_state: GlobalState
-    @state: Hash[URI::Generic, Document[untyped]]
+    @state: Hash[String, Document[untyped]]
 
     def set: (uri: URI::Generic, source: String, version: Integer, language_id: Symbol) -> Document[untyped]
   end

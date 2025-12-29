@@ -7,7 +7,8 @@
         "popen",
         "readlines",
         "rubocop",
-        "Takeshi"
+        "Takeshi",
+        "yardoc"
     ],
     "rbs-helper.rbs-inline-on-save": true,
     "rbs-helper.rbs-inline-signature-directory": "sig/"

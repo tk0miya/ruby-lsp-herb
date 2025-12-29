@@ -1,0 +1,13 @@
+module RubyLsp
+  module Requests
+    class Diagnostics
+      def initialize: (GlobalState, Document[untyped]) -> void
+      def perform: () -> untyped
+    end
+
+    class Request
+      class InvalidFormatter < StandardError
+      end
+    end
+  end
+end

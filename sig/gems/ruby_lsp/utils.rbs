@@ -1,0 +1,13 @@
+module RubyLsp
+  class Message
+  end
+
+  class Notification < Message
+    def self.window_show_message: (String message, ?type: Integer) -> Notification
+    def self.window_log_message: (String message, ?type: Integer) -> Notification
+  end
+
+  class Result
+    def initialize: (id: Integer, response: untyped) -> void
+  end
+end

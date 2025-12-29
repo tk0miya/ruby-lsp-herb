@@ -15,3 +15,5 @@ gem "rubocop-rake", "~> 0.7.1"
 gem "rubocop-rspec", "~> 3.8"
 
 gem "rbs-inline", "~> 0.12.0"
+
+gem "steep", "~> 1.10"
