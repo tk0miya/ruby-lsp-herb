@@ -65,9 +65,16 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
             it_behaves_like "extracts Ruby code"
           end
 
-          context "when it contains ERB comment tags" do
-            let(:source) { "<%# comment %>" }
-            let(:expected) { "              " }
+          context "when it contains single-line ERB comment" do
+            let(:source) { "<%# TODO: fix %>" }
+            let(:expected) { "  # TODO: fix   " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
+          context "when it contains indented single-line ERB comment" do
+            let(:source) { "    <%# note %>" }
+            let(:expected) { "      # note   " }
 
             it_behaves_like "extracts Ruby code"
           end

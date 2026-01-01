@@ -21,7 +21,9 @@
       "Bash(tree:*)",
       "Bash(grep:*)",
       "Bash(bundle exec rake:*)",
-      "WebFetch(domain:rubydoc.info)"
+      "WebFetch(domain:rubydoc.info)",
+      "Bash(find:*)",
+      "Bash(bundle exec steep:*)"
     ]
   }
 }

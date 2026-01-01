@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "herb"
+require_relative "erb_comment_transformer"
 
 module RuboCop
   module Herb
@@ -68,14 +69,36 @@ module RuboCop
 
         # Copy Ruby code from ERB nodes
         erb_nodes.each do |node|
-          next if comment_node?(node)
-
-          from = node.content.range.from
-          content_bytes = node.content.value.bytes
-          result_bytes[from, content_bytes.length] = content_bytes
+          if comment_node?(node)
+            insert_comment(node, result_bytes)
+          else
+            insert_ruby_code(node, result_bytes)
+          end
         end
 
         result_bytes.pack("C*").force_encoding(original_source.encoding)
+      end
+
+      # @rbs node: untyped
+      # @rbs result_bytes: Array[Integer]
+      def insert_ruby_code(node, result_bytes) #: void
+        from = node.content.range.from
+        content_bytes = node.content.value.bytes
+        result_bytes[from, content_bytes.length] = content_bytes
+      end
+
+      # @rbs node: untyped
+      # @rbs result_bytes: Array[Integer]
+      def insert_comment(node, result_bytes) #: void
+        content = ERBCommentTransformer.call(node)
+        return unless content
+
+        tag_start = node.tag_opening.range.from
+        result_bytes[tag_start + 2] = 35 # '#'
+
+        from = node.content.range.from
+        content_bytes = content.bytes
+        result_bytes[from, content_bytes.length] = content_bytes
       end
 
       # @rbs node: untyped

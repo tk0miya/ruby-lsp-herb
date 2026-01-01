@@ -1,0 +1,12 @@
+# Generated from lib/rubocop/herb/erb_comment_transformer.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Transforms ERB comment content to Ruby comment format.
+    # Returns the transformed content or nil if the comment cannot be transformed.
+    module ERBCommentTransformer
+      # @rbs node: untyped
+      def self.call: (untyped node) -> String?
+    end
+  end
+end

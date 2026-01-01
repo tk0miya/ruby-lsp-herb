@@ -30,6 +30,14 @@ module RuboCop
       def build_whitespace_padded_source: (String original_source, Array[untyped] erb_nodes) -> String
 
       # @rbs node: untyped
+      # @rbs result_bytes: Array[Integer]
+      def insert_ruby_code: (untyped node, Array[Integer] result_bytes) -> void
+
+      # @rbs node: untyped
+      # @rbs result_bytes: Array[Integer]
+      def insert_comment: (untyped node, Array[Integer] result_bytes) -> void
+
+      # @rbs node: untyped
       def comment_node?: (untyped node) -> bool
 
       # @rbs code: String
