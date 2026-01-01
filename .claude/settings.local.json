@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(cat:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.rubocop.org)",
+      "WebFetch(domain:www.rubydoc.info)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:marcoroth.dev)",
+      "Bash(bundle exec gem:*)",
+      "Bash(bundle show:*)",
+      "Bash(bundle exec ruby:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(bundle install:*)",
+      "Bash(bundle exec rbs-inline:*)",
+      "Bash(bundle exec rubocop:*)",
+      "Bash(ruby -e:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(git -C /Users/tkomiya/work/ruby-lsp-herb log --oneline -20)",
+      "Bash(tree:*)"
+    ]
+  }
+}
