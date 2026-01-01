@@ -29,7 +29,7 @@ module RubyLsp
           visitor = MyVisitor.new
           parse_result.visit(visitor)
           visitor.offences.each do |message, location|
-            parse_result.warnings << ::Herb::Warnings::Warning.new(:warning, location, message)
+            parse_result.warnings << ::Herb::Warnings::Warning.new("warning", location, message)
           end
         end
       end

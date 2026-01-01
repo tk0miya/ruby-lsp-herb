@@ -1,0 +1,6 @@
+module Prism
+  class Source
+    def self.for: (String source, ?Integer start_line, ?Array[Integer] offsets) -> Source
+                | ...
+  end
+end
