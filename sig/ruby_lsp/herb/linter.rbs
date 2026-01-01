@@ -1,0 +1,26 @@
+# Generated from lib/ruby_lsp/herb/linter.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    class Linter
+      attr_reader filename: String?
+
+      # @rbs args: Array[String]
+      def initialize: (Array[String] args) -> void
+
+      def run: () -> void
+
+      def lint_html_erb: (untyped result) -> void
+    end
+
+    class MyVisitor < ::Herb::Visitor
+      attr_reader offences: Array[[ String, ::Herb::Location ]]
+
+      def initialize: () -> void
+
+      def visit_child_nodes: (untyped node) -> void
+
+      def visit_erb_nodes: (untyped node) -> void
+    end
+  end
+end

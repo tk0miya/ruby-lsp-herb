@@ -8,6 +8,14 @@ module RubyLsp
 
       def parse!: () -> void
 
+      def parse_html_erb: (untyped source) -> void
+
+      def convert_parse_result: (untyped herb_parse_result) -> Prism::ParseResult
+
+      def convert_source: (untyped source) -> Prism::Source
+
+      def convert_location: (untyped source, untyped location) -> Prism::Location
+
       def syntax_error?: () -> bool
     end
   end
