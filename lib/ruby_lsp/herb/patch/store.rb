@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "ruby_lsp/store"
+
 module RubyLsp
   class Store
     alias original_set set

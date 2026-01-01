@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "ruby_lsp/document"
 require "ruby_lsp/erb_document"
 
 require "active_support/all"

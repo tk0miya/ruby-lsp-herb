@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "ruby_lsp/base_server"
+require "ruby_lsp/server"
+
 module RubyLsp
   class Server < BaseServer
     alias original_text_document_diagnostic text_document_diagnostic
