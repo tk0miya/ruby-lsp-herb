@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "rubocop"
-require "ruby-lsp-herb"
+require "ruby_lsp_herb"
 
 RSpec.describe RuboCop::Herb::RubyExtractor do
   describe ".call" do
@@ -28,44 +28,56 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
     context "when file is .html.erb" do
       let(:path) { "test.html.erb" }
 
-      context "when the ERB document contains a single ERB tag" do
-        let(:source) { "<%= user_name %>" }
+      context "when HTML parsing fails" do
+        let(:source) { "<%= unclosed" }
 
-        it "extracts a single Ruby code fragment" do
-          expect(subject).to match([
-                                     {
-                                       offset: 3,
-                                       processed_source: an_instance_of(RuboCop::ProcessedSource)
-                                                           .and(have_attributes(raw_source: " user_name "))
-                                     }
-                                   ])
-        end
-      end
-
-      context "when the ERB document contains multiple ERB tags" do
-        let(:source) { "<%= foo %>\n<%= bar %>" }
-
-        it "extracts multiple Ruby code fragments" do
-          expect(subject).to match([
-                                     {
-                                       offset: 3,
-                                       processed_source: an_instance_of(RuboCop::ProcessedSource)
-                                                           .and(have_attributes(raw_source: " foo "))
-                                     },
-                                     {
-                                       offset: 14,
-                                       processed_source: an_instance_of(RuboCop::ProcessedSource)
-                                                           .and(have_attributes(raw_source: " bar "))
-                                     }
-                                   ])
-        end
-      end
-
-      context "when the ERB document contains ERB comment tags" do
-        let(:source) { "<%# This is a comment %>" }
-
-        it "skips ERB comment tags" do
+        it "returns empty array" do
           expect(subject).to eq([])
+        end
+      end
+
+      context "when HTML parsing succeeds" do
+        context "when HTML contains no ERB tags" do
+          let(:source) { "<html><body></body></html>" }
+
+          it "returns empty array" do
+            expect(subject).to eq([])
+          end
+        end
+
+        context "when HTML contains ERB tags" do
+          shared_examples "extracts Ruby code" do
+            it "returns extracted Ruby code with whitespace padding" do
+              expect(subject).to match([
+                                         {
+                                           offset: 0,
+                                           processed_source: an_instance_of(RuboCop::ProcessedSource)
+                                                               .and(have_attributes(raw_source: expected))
+                                         }
+                                       ])
+            end
+          end
+
+          context "when it contains multiple ERB tags" do
+            let(:source) { "<%= foo %>\n<%= bar %>" }
+            let(:expected) { "    foo   \n    bar   " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
+          context "when it contains ERB comment tags" do
+            let(:source) { "<%# comment %>" }
+            let(:expected) { "              " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
+          context "when it contains HTML tags" do
+            let(:source) { "<p><%= x %></p>" }
+            let(:expected) { "       x       " }
+
+            it_behaves_like "extracts Ruby code"
+          end
         end
       end
     end
@@ -76,23 +88,11 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
     let(:parse_result) { Herb.parse(source) }
     let(:visitor) { described_class.new }
+    let(:source) { "<%# comment %><%= foo %>\n<% bar %>" }
 
-    context "when the ERB document contains multiple ERB tags" do
-      let(:source) { "<%= foo %>\n<%= bar %>" }
-
-      it "collects ERB nodes" do
-        subject
-        expect(visitor.erb_nodes.size).to eq(2)
-      end
-    end
-
-    context "when the ERB document contains comment nodes" do
-      let(:source) { "<%# comment %><%= code %>" }
-
-      it "collects ERB nodes except comment nodes" do
-        subject
-        expect(visitor.erb_nodes.size).to eq(1)
-      end
+    it "collects all ERB nodes" do
+      subject
+      expect(visitor.erb_nodes.size).to eq(3)
     end
   end
 end

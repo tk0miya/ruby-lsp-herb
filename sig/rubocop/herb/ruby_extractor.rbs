@@ -22,6 +22,16 @@ module RuboCop
 
       def supported_file?: () -> bool
 
+      # @rbs parse_result: Herb::ParseResult
+      def build_unified_ruby_source: (Herb::ParseResult parse_result) -> String?
+
+      # @rbs original_source: String
+      # @rbs erb_nodes: Array[untyped]
+      def build_whitespace_padded_source: (String original_source, Array[untyped] erb_nodes) -> String
+
+      # @rbs node: untyped
+      def comment_node?: (untyped node) -> bool
+
       # @rbs code: String
       def build_processed_source: (String code) -> RuboCop::ProcessedSource
 
@@ -38,9 +48,6 @@ module RuboCop
 
         # @rbs node: untyped
         def erb_node?: (untyped node) -> bool
-
-        # @rbs node: untyped
-        def comment_node?: (untyped node) -> bool
       end
     end
   end

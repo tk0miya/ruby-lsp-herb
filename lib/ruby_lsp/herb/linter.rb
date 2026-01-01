@@ -13,7 +13,7 @@ module RubyLsp
         @filename = args.first
       end
 
-      def run #: void # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+      def run #: void # rubocop:disable Metrics/AbcSize
         raise "Filename is required" unless filename
         raise "File not found: #{filename}" unless File.exist?(filename)
 

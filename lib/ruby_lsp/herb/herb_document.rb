@@ -20,7 +20,7 @@ module RubyLsp
         true
       end
 
-      def parse_html_erb(source) #: void # rubocop:disable Metrics/AbcSize
+      def parse_html_erb(source) #: void
         ::Herb.parse(source).tap do |parse_result|
           parse_result.define_singleton_method(:code_units_cache) { |_encoding| nil }
           parse_result.define_singleton_method(:failure?) { warnings.any? || errors.any? }
@@ -52,7 +52,7 @@ module RubyLsp
         Prism::Source.for(source, 1, offsets)
       end
 
-      def convert_location(source, location) #: Prism::Location # rubocop:disable Metrics/AbcSize
+      def convert_location(source, location) #: Prism::Location
         from = source.offsets[location.start.line - 1] + location.start.column
         to = source.offsets[location.end.line - 1] + location.end.column
         Prism::Location.new(source, from, to - from)

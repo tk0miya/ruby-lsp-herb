@@ -30,18 +30,13 @@ module RuboCop
         parse_result = ::Herb.parse(processed_source.raw_source)
         return [] if parse_result.errors.any?
 
-        visitor = ErbNodeVisitor.new
-        parse_result.visit(visitor)
+        unified_source = build_unified_ruby_source(parse_result)
+        return [] if unified_source.nil?
 
-        visitor.erb_nodes.filter_map do |node|
-          code = node.content.value
-          next if code.strip.empty?
-
-          {
-            offset: node.content.range.from,
-            processed_source: build_processed_source(code)
-          }
-        end
+        [{
+          offset: 0,
+          processed_source: build_processed_source(unified_source)
+        }]
       end
 
       private
@@ -52,6 +47,42 @@ module RuboCop
         SUPPORTED_EXTENSIONS.any? do |ext|
           processed_source.path.end_with?(ext)
         end
+      end
+
+      # @rbs parse_result: Herb::ParseResult
+      def build_unified_ruby_source(parse_result) #: String?
+        original_source = processed_source.raw_source
+        visitor = ErbNodeVisitor.new
+        parse_result.visit(visitor)
+
+        return nil if visitor.erb_nodes.empty?
+
+        build_whitespace_padded_source(original_source, visitor.erb_nodes)
+      end
+
+      # @rbs original_source: String
+      # @rbs erb_nodes: Array[untyped]
+      def build_whitespace_padded_source(original_source, erb_nodes) #: String
+        # Initialize with spaces (preserve newlines)
+        result_bytes = original_source.bytes.map { |b| [10, 13].include?(b) ? b : 32 }
+
+        # Copy Ruby code from ERB nodes
+        erb_nodes.each do |node|
+          next if comment_node?(node)
+
+          from = node.content.range.from
+          content_bytes = node.content.value.bytes
+          result_bytes[from, content_bytes.length] = content_bytes
+        end
+
+        result_bytes.pack("C*").force_encoding(original_source.encoding)
+      end
+
+      # @rbs node: untyped
+      def comment_node?(node) #: bool
+        return false unless node.respond_to?(:tag_opening)
+
+        node.tag_opening.value == "<%#"
       end
 
       # @rbs code: String
@@ -78,7 +109,7 @@ module RuboCop
 
         # @rbs node: untyped
         def visit_child_nodes(node) #: void
-          @erb_nodes << node if erb_node?(node) && !comment_node?(node)
+          @erb_nodes << node if erb_node?(node)
           super
         end
 
@@ -87,13 +118,6 @@ module RuboCop
         # @rbs node: untyped
         def erb_node?(node) #: bool
           node.node_name.start_with?("ERB")
-        end
-
-        # @rbs node: untyped
-        def comment_node?(node) #: bool
-          return false unless node.respond_to?(:tag_opening)
-
-          node.tag_opening.value == "<%#"
         end
       end
     end

@@ -18,7 +18,10 @@
       "Bash(ruby -e:*)",
       "Bash(bundle exec rspec:*)",
       "Bash(git -C /Users/tkomiya/work/ruby-lsp-herb log --oneline -20)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(bundle exec rake:*)",
+      "WebFetch(domain:rubydoc.info)"
     ]
   }
 }

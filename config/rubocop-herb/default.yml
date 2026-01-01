@@ -4,8 +4,23 @@ AllCops:
   Include:
     - "**/*.html.erb"
 
+# Ruby code in HTML+ERB files may be aligned differently
+Layout/IndentationConsistency:
+  Exclude:
+    - "**/*.html.erb"
+
+# Ruby code in HTML+ERB files may have different indentation width
+Layout/IndentationWidth:
+  Exclude:
+    - "**/*.html.erb"
+
 # Ruby code in HTML+ERB files may have different indentation rules
 Layout/InitialIndentation:
+  Exclude:
+    - "**/*.html.erb"
+
+# non-Ruby tags may be inserted before Ruby code
+Layout/LeadingEmptyLines:
   Exclude:
     - "**/*.html.erb"
 
