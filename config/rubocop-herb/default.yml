@@ -1,0 +1,30 @@
+# Default RuboCop configuration for ERB files
+
+AllCops:
+  Include:
+    - "**/*.html.erb"
+
+# Ruby code in HTML+ERB files may have different indentation rules
+Layout/InitialIndentation:
+  Exclude:
+    - "**/*.html.erb"
+
+# Layout cops may conflict with ERB template formatting
+Layout/TrailingEmptyLines:
+  Exclude:
+    - "**/*.html.erb"
+
+# Extracted Ruby code from ERB may have trailing whitespace
+Layout/TrailingWhitespace:
+  Exclude:
+    - "**/*.html.erb"
+
+# ERB code fragments may not have explicit return values
+Lint/Void:
+  Exclude:
+    - "**/*.html.erb"
+
+# ERB files don't have frozen string literal comments
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/*.html.erb"

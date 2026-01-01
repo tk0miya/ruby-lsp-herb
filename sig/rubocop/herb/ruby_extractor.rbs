@@ -1,0 +1,47 @@
+# Generated from lib/rubocop/herb/ruby_extractor.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Extractor for extracting Ruby code from ERB templates using Herb parser.
+    # This class is registered with RuboCop::Runner.ruby_extractors to enable
+    # linting of Ruby code embedded in ERB files.
+    class RubyExtractor
+      SUPPORTED_EXTENSIONS: Array[String]
+
+      attr_reader processed_source: RuboCop::ProcessedSource
+
+      # @rbs processed_source: RuboCop::ProcessedSource
+      def self.call: (RuboCop::ProcessedSource processed_source) -> Array[{ offset: Integer, processed_source: RuboCop::ProcessedSource }]?
+
+      # @rbs processed_source: RuboCop::ProcessedSource
+      def initialize: (RuboCop::ProcessedSource processed_source) -> void
+
+      def call: () -> rubyExtractorResult
+
+      private
+
+      def supported_file?: () -> bool
+
+      # @rbs code: String
+      def build_processed_source: (String code) -> RuboCop::ProcessedSource
+
+      # Visitor class to collect ERB nodes from Herb AST
+      class ErbNodeVisitor < ::Herb::Visitor
+        attr_reader erb_nodes: Array[untyped]
+
+        def initialize: () -> void
+
+        # @rbs node: untyped
+        def visit_child_nodes: (untyped node) -> void
+
+        private
+
+        # @rbs node: untyped
+        def erb_node?: (untyped node) -> bool
+
+        # @rbs node: untyped
+        def comment_node?: (untyped node) -> bool
+      end
+    end
+  end
+end

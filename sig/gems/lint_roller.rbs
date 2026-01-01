@@ -1,0 +1,18 @@
+module LintRoller
+  class About
+    def initialize: (?name: String, ?version: String, ?homepage: String, ?description: String) -> void
+  end
+
+  class Context
+    attr_reader engine: Symbol?
+
+    def initialize: (?runner: Symbol, ?runner_version: String, ?engine: Symbol, ?engine_version: String, ?rule_format: Symbol, ?target_ruby_version: Gem::Version) -> void
+  end
+
+  class Plugin
+  end
+
+  class Rules
+    def initialize: (?type: Symbol, ?config_format: Symbol | String | Pathname, ?value: untyped, ?error: untyped) -> void
+  end
+end

@@ -1,0 +1,20 @@
+# Generated from lib/rubocop/herb/plugin.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # LintRoller plugin for RuboCop integration.
+    # This plugin registers the RubyExtractor with RuboCop::Runner.ruby_extractors
+    # to enable linting of Ruby code embedded in ERB templates.
+    class Plugin < LintRoller::Plugin
+      CONFIG_PATH: String
+
+      def about: () -> LintRoller::About
+
+      # @rbs context: LintRoller::Context
+      def supported?: (LintRoller::Context context) -> bool
+
+      # @rbs context: LintRoller::Context
+      def rules: (LintRoller::Context context) -> LintRoller::Rules
+    end
+  end
+end
