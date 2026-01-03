@@ -148,6 +148,18 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
               it_behaves_like "extracts Ruby code"
             end
           end
+
+          context "when it contains multibyte characters" do
+            let(:source) { "<%= \"日本語\" %>" }
+            let(:expected) { "    \"日本語\"   " }
+
+            it_behaves_like "extracts Ruby code"
+
+            it "preserves byte positions" do
+              result = subject
+              expect(result[0][:processed_source].raw_source.bytesize).to eq(source.bytesize)
+            end
+          end
         end
       end
     end

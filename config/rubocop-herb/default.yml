@@ -44,8 +44,23 @@ Lint/Void:
   Exclude:
     - "**/*.html.erb"
 
+# Control flow bodies may contain only HTML (no Ruby code)
+Lint/EmptyConditionalBody:
+  Exclude:
+    - "**/*.html.erb"
+
+# Case/when bodies may contain only HTML (no Ruby code)
+Lint/EmptyWhen:
+  Exclude:
+    - "**/*.html.erb"
+
 # ERB files don't have frozen string literal comments
 Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/*.html.erb"
+
+# Else branches may contain only HTML (no Ruby code)
+Style/EmptyElse:
   Exclude:
     - "**/*.html.erb"
 
@@ -56,5 +71,10 @@ Style/IfUnlessModifier:
 
 # Semicolons are inserted between ERB tags on the same line
 Style/IfWithSemicolon:
+  Exclude:
+    - "**/*.html.erb"
+
+# Semicolons are inserted between ERB tags on the same line
+Style/Semicolon:
   Exclude:
     - "**/*.html.erb"

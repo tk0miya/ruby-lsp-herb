@@ -89,4 +89,103 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       end
     end
   end
+
+  context "when mixing output and statement tags" do
+    context "with inline if expression using output tag" do
+      let(:source) { "<%= if condition then 'yes' else 'no' end %>" }
+
+      it "parses correctly and detects style offense" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq(%w[Style/OneLineConditional])
+      end
+    end
+
+    context "with ternary operator" do
+      let(:source) { "<%= condition ? 'yes' : 'no' %>" }
+
+      it "parses correctly" do
+        runner.run(path, source, {})
+        expect(runner.offenses).to be_empty
+      end
+    end
+
+    context "with case expression using output tag" do
+      let(:source) { "<%= case x; when 1 then 'one'; else 'other'; end %>" }
+
+      it "parses correctly" do
+        runner.run(path, source, {})
+        expect(runner.offenses).to be_empty
+      end
+    end
+  end
+
+  context "when ERB contains multibyte characters" do
+    let(:source) { "<%= '日本語' %>" }
+
+    it "parses correctly and reports no offenses" do
+      runner.run(path, source, {})
+      expect(runner.offenses).to be_empty
+    end
+  end
+
+  context "when multi-line ERB with control flow structures" do
+    context "with if-elsif-else block" do
+      let(:source) do
+        <<~ERB
+          <% if user.admin? %>
+            <p><%= user.name %></p>
+          <% elsif user.guest? %>
+            <p>Guest</p>
+          <% else %>
+            <p><%= user.email %></p>
+          <% end %>
+        ERB
+      end
+
+      it "parses correctly and reports no offenses" do
+        runner.run(path, source, {})
+        expect(runner.offenses).to be_empty
+      end
+    end
+
+    context "with case-when-else block" do
+      let(:source) do
+        <<~ERB
+          <% case role %>
+          <% when :admin %>
+            <p><%= admin_label %></p>
+          <% when :editor %>
+            <p>Editor</p>
+          <% else %>
+            <p>Guest</p>
+          <% end %>
+        ERB
+      end
+
+      it "parses correctly and reports no offenses" do
+        runner.run(path, source, {})
+        expect(runner.offenses).to be_empty
+      end
+    end
+
+    context "with nested if inside loop" do
+      let(:source) do
+        <<~ERB
+          <% users.each do |user| %>
+            <% if user.active? %>
+              <p><%= user.name %></p>
+            <% else %>
+              <p><%= user.email %></p>
+            <% end %>
+          <% end %>
+        ERB
+      end
+
+      it "parses correctly and reports no offenses" do
+        runner.run(path, source, {})
+        expect(runner.offenses).to be_empty
+      end
+    end
+  end
 end
