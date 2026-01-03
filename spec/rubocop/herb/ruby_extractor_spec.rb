@@ -150,8 +150,8 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when do block contains only HTML content" do
             let(:source) { "<% items.each do |item| %>\n  <p>HTML</p>\n<% end %>" }
-            # Placeholder string inserted to prevent Lint/EmptyBlock
-            let(:expected) { "   items.each do |item|;  \n'          ';\n   end;  " }
+            # Placeholder nil; inserted to prevent Lint/EmptyBlock
+            let(:expected) { "   items.each do |item|;  \nnil;         \n   end;  " }
 
             it_behaves_like "extracts Ruby code"
           end

@@ -7,6 +7,8 @@ module RuboCop
     class BlockPlaceholder
       LF: Integer
 
+      PLACEHOLDER: Array[Integer]
+
       class Result < Data
         attr_reader position(): Integer
 
@@ -48,10 +50,7 @@ module RuboCop
 
       def offset: () -> Integer
 
-      def calculate_placeholder_length: () -> Integer
-
-      # @rbs length: Integer
-      def generate_placeholder: (Integer length) -> Array[Integer]
+      def enough_space?: () -> bool
     end
   end
 end
