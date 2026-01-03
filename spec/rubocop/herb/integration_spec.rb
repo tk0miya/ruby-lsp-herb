@@ -85,7 +85,7 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       it "detects offenses" do
         runner.run(path, source, {})
         cop_names = runner.offenses.map(&:cop_name)
-        expect(cop_names).to include("Layout/SpaceInsideParens")
+        expect(cop_names).to eq(%w[Style/MethodCallWithoutArgsParentheses Layout/SpaceInsideParens])
       end
     end
   end
@@ -185,6 +185,23 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       it "parses correctly and reports no offenses" do
         runner.run(path, source, {})
         expect(runner.offenses).to be_empty
+      end
+    end
+
+    context "with do block containing only HTML" do
+      let(:source) do
+        <<~ERB
+          <%= link_to root_path do %>
+            <i class="fa fa-home"></i>
+            Home
+          <% end %>
+        ERB
+      end
+
+      it "does not report Lint/EmptyBlock" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq([])
       end
     end
   end

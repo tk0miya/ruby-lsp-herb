@@ -72,6 +72,20 @@ bundle exec rbs-inline --opt-out --output=sig/ [filename]
 - **Unit Tests** (`spec/`): Tests that verify functionality independently without external dependencies. Place tests here when the component can be tested in isolation.
 - **Integration Tests** (`spec/rubocop/herb/integration_spec.rb`): Tests that require RuboCop integration. Place tests here when verifying end-to-end behavior with RuboCop.
 
+### Integration Test Assertions
+
+In integration tests, always use `eq` matcher instead of `include` or `not_to include` when checking cop names. Using `include` only verifies part of the result and may miss other unexpected offenses:
+
+```ruby
+# Good - verifies the complete result
+expect(cop_names).to eq(%w[Style/StringLiterals])
+expect(cop_names).to eq([])
+
+# Bad - may hide other problems
+expect(cop_names).to include("Style/StringLiterals")
+expect(cop_names).not_to include("Lint/EmptyBlock")
+```
+
 ### Development Workflow
 
 After completing implementation, always run the full test suite and static analysis:

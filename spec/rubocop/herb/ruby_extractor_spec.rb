@@ -148,6 +148,22 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
             end
           end
 
+          context "when do block contains only HTML content" do
+            let(:source) { "<% items.each do |item| %>\n  <p>HTML</p>\n<% end %>" }
+            # Placeholder string inserted to prevent Lint/EmptyBlock
+            let(:expected) { "   items.each do |item|;  \n'          ';\n   end;  " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
+          context "when do block contains HTML and Ruby" do
+            let(:source) { "<% items.each do |item| %>\n  <p><%= item %></p>\n<% end %>" }
+            # No placeholder needed when Ruby code exists in block
+            let(:expected) { "   items.each do |item|;  \n         item;      \n   end;  " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
           context "when it contains multibyte characters" do
             let(:source) { "<%= \"日本語\" %>" }
             let(:expected) { "    \"日本語\";  " }
