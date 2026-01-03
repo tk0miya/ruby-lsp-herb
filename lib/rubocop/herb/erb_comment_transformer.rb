@@ -7,7 +7,10 @@ module RuboCop
     module ERBCommentTransformer
       class << self
         # @rbs node: untyped
-        def call(node) #: String?
+        # @rbs following_nodes: Array[untyped]
+        def call(node, following_nodes) #: String?
+          return nil if followed_by_code?(following_nodes)
+
           lines = node.content.value.split("\n", -1)
           target_column = node.location.start.column + 2
 
@@ -24,6 +27,20 @@ module RuboCop
             end
             line
           end.join("\n")
+        end
+
+        private
+
+        # @rbs following_nodes: Array[untyped]
+        def followed_by_code?(following_nodes) #: bool
+          following_nodes.any? { |node| !comment_node?(node) }
+        end
+
+        # @rbs node: untyped
+        def comment_node?(node) #: bool
+          return false unless node.respond_to?(:tag_opening)
+
+          node.tag_opening.value == "<%#"
         end
       end
     end

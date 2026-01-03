@@ -4,6 +4,11 @@ AllCops:
   Include:
     - "**/*.html.erb"
 
+# Whitespace padding preserves character positions but creates extra spaces
+Layout/ExtraSpacing:
+  Exclude:
+    - "**/*.html.erb"
+
 # Ruby code in HTML+ERB files may be aligned differently
 Layout/IndentationConsistency:
   Exclude:
@@ -41,5 +46,15 @@ Lint/Void:
 
 # ERB files don't have frozen string literal comments
 Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/*.html.erb"
+
+# Conditional HTML wrapping is extracted as single line
+Style/IfUnlessModifier:
+  Exclude:
+    - "**/*.html.erb"
+
+# Semicolons are inserted between ERB tags on the same line
+Style/IfWithSemicolon:
   Exclude:
     - "**/*.html.erb"

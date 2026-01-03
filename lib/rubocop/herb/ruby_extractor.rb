@@ -10,6 +10,7 @@ module RuboCop
     # linting of Ruby code embedded in ERB files.
     class RubyExtractor
       SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
+      DO_BLOCK_PATTERN = /\bdo(\s*\|[^|]*\|)?\s*\z/ #: Regexp
 
       attr_reader :processed_source #: RuboCop::ProcessedSource
 
@@ -68,11 +69,13 @@ module RuboCop
         result_bytes = original_source.bytes.map { |b| [10, 13].include?(b) ? b : 32 }
 
         # Copy Ruby code from ERB nodes
-        erb_nodes.each do |node|
+        erb_nodes.each_with_index do |node, idx|
+          following_nodes = following_nodes_on_same_line(node, erb_nodes[(idx + 1)..])
+
           if comment_node?(node)
-            insert_comment(node, result_bytes)
+            insert_comment(node, following_nodes, result_bytes)
           else
-            insert_ruby_code(node, result_bytes)
+            insert_ruby_code(node, following_nodes, result_bytes)
           end
         end
 
@@ -80,17 +83,21 @@ module RuboCop
       end
 
       # @rbs node: untyped
+      # @rbs following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
-      def insert_ruby_code(node, result_bytes) #: void
+      def insert_ruby_code(node, following_nodes, result_bytes) #: void
         from = node.content.range.from
         content_bytes = node.content.value.bytes
         result_bytes[from, content_bytes.length] = content_bytes
+
+        result_bytes[semicolon_position(node)] = 59 if needs_semicolon?(node, following_nodes) # ';'
       end
 
       # @rbs node: untyped
+      # @rbs following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
-      def insert_comment(node, result_bytes) #: void
-        content = ERBCommentTransformer.call(node)
+      def insert_comment(node, following_nodes, result_bytes) #: void
+        content = ERBCommentTransformer.call(node, following_nodes)
         return unless content
 
         tag_start = node.tag_opening.range.from
@@ -106,6 +113,36 @@ module RuboCop
         return false unless node.respond_to?(:tag_opening)
 
         node.tag_opening.value == "<%#"
+      end
+
+      # @rbs content: String
+      def ends_with_do_block?(content) #: bool
+        content.match?(DO_BLOCK_PATTERN)
+      end
+
+      # @rbs node: untyped
+      # @rbs candidates: Array[untyped]?
+      def following_nodes_on_same_line(node, candidates) #: Array[untyped]
+        return [] unless candidates
+
+        end_line = node.location.end.line
+        candidates.take_while { |n| n.location.start.line == end_line }
+      end
+
+      # @rbs node: untyped
+      # @rbs following_nodes: Array[untyped]
+      def needs_semicolon?(node, following_nodes) #: bool
+        return false if following_nodes.empty?
+        return false if ends_with_do_block?(node.content.value)
+
+        true
+      end
+
+      # @rbs node: untyped
+      def semicolon_position(node) #: Integer
+        content = node.content.value
+        trailing_spaces = content.length - content.rstrip.length
+        node.content.range.to - trailing_spaces
       end
 
       # @rbs code: String

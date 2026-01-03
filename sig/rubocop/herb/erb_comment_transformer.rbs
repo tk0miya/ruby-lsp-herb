@@ -6,7 +6,14 @@ module RuboCop
     # Returns the transformed content or nil if the comment cannot be transformed.
     module ERBCommentTransformer
       # @rbs node: untyped
-      def self.call: (untyped node) -> String?
+      # @rbs following_nodes: Array[untyped]
+      def self.call: (untyped node, Array[untyped] following_nodes) -> String?
+
+      # @rbs following_nodes: Array[untyped]
+      private def self.followed_by_code?: (Array[untyped] following_nodes) -> bool
+
+      # @rbs node: untyped
+      private def self.comment_node?: (untyped node) -> bool
     end
   end
 end

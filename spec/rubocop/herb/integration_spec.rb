@@ -48,4 +48,45 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       expect(runner.offenses).to be_empty
     end
   end
+
+  context "when multiple ERB tags are on the same line" do
+    context "with if/end block" do
+      let(:source) { "<% if user %><%= user.name %><% end %>" }
+
+      it "detects only style offenses" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq(%w[Style/SafeNavigation])
+      end
+    end
+
+    context "with do block" do
+      let(:source) { "<% items.each do |item| %><%= item.name %><% end %>" }
+
+      it "detects only style offenses" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq(%w[Style/BlockDelimiters Style/SymbolProc])
+      end
+    end
+
+    context "with comment followed by code" do
+      let(:source) { "<%# comment %><%= value %>" }
+
+      it "parses correctly and reports no offenses" do
+        runner.run(path, source, {})
+        expect(runner.offenses).to be_empty
+      end
+    end
+
+    context "with violation in one of the tags" do
+      let(:source) { "<% if user %><%= foo( ) %><% end %>" }
+
+      it "detects offenses" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to include("Layout/SpaceInsideParens")
+      end
+    end
+  end
 end

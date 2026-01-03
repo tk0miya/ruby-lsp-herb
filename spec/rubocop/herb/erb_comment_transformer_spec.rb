@@ -5,21 +5,61 @@ require "ruby_lsp_herb"
 
 RSpec.describe RuboCop::Herb::ERBCommentTransformer do
   describe ".call" do
-    subject { described_class.call(node) }
+    subject { described_class.call(node, following_nodes) }
 
-    let(:node) { extract_erb_node(source) }
+    let(:node) { erb_nodes.first }
+    let(:erb_nodes) { extract_erb_nodes(source) }
+    let(:following_nodes) { [] }
 
-    def extract_erb_node(source)
+    def extract_erb_nodes(source)
       visitor = RuboCop::Herb::RubyExtractor::ErbNodeVisitor.new
       Herb.parse(source).visit(visitor)
-      visitor.erb_nodes.first
+      visitor.erb_nodes
     end
 
     context "when comment is single-line" do
-      let(:source) { "<%# TODO: fix %>" }
+      context "when not followed by other nodes" do
+        let(:source) { "<%# TODO: fix %>" }
 
-      it "returns content as-is" do
-        expect(subject).to eq(" TODO: fix ")
+        it "returns content as-is" do
+          expect(subject).to eq(" TODO: fix ")
+        end
+      end
+
+      context "when followed by code on the same line" do
+        let(:source) { "<%# comment %><%= value %>" }
+        let(:following_nodes) { erb_nodes[1..] }
+
+        it "returns nil" do
+          expect(subject).to be_nil
+        end
+      end
+
+      context "when followed by comment on the same line" do
+        let(:source) { "<%# comment1 %><%# comment2 %>" }
+        let(:following_nodes) { erb_nodes[1..] }
+
+        it "returns content" do
+          expect(subject).to eq(" comment1 ")
+        end
+      end
+
+      context "when followed by multiple comments then code on the same line" do
+        let(:source) { "<%# comment1 %><%# comment2 %><%= value %>" }
+        let(:following_nodes) { erb_nodes[1..] }
+
+        it "returns nil" do
+          expect(subject).to be_nil
+        end
+      end
+
+      context "when followed by code on a different line" do
+        let(:source) { "<%# comment %>\n<%= value %>" }
+        let(:following_nodes) { [] }
+
+        it "returns content" do
+          expect(subject).to eq(" comment ")
+        end
       end
     end
 
@@ -72,6 +112,24 @@ RSpec.describe RuboCop::Herb::ERBCommentTransformer do
 
         it "returns nil (unsupported)" do
           expect(subject).to be_nil
+        end
+      end
+
+      context "when followed by code on the same line" do
+        let(:source) { "<%# line-1\n   line-2 %><%= value %>" }
+        let(:following_nodes) { erb_nodes[1..] }
+
+        it "returns nil" do
+          expect(subject).to be_nil
+        end
+      end
+
+      context "when followed by code on a different line" do
+        let(:source) { "<%# line-1\n   line-2 %>\n<%= value %>" }
+        let(:following_nodes) { [] }
+
+        it "returns content" do
+          expect(subject).to eq(" line-1\n  #line-2 ")
         end
       end
     end

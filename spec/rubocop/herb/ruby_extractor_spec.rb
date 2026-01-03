@@ -85,6 +85,69 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
             it_behaves_like "extracts Ruby code"
           end
+
+          context "when multiple ERB tags are on same line" do
+            context "with simple statements" do
+              let(:source) { "<% if user %><%= user.name %><% end %>" }
+              let(:expected) { "   if user;      user.name;     end   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with no spaces around content" do
+              let(:source) { "<%foo%><%bar%>" }
+              let(:expected) { "  foo;   bar  " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with do block" do
+              let(:source) { "<% items.each do |item| %><%= item.name %><% end %>" }
+              # No semicolon after 'do |item|'
+              let(:expected) { "   items.each do |item|       item.name;     end   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with do block without params" do
+              let(:source) { "<% loop do %><%= x %><% end %>" }
+              let(:expected) { "   loop do       x;     end   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with comment followed by code" do
+              let(:source) { "<%# comment %><%= value %>" }
+              # Comment is ignored, only code is extracted
+              let(:expected) { "                  value   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with multi-line comment followed by code" do
+              let(:source) { "<%# long\n   comment %><%= value %>" }
+              # Comment is ignored, only code is extracted
+              let(:expected) { "        \n                 value   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with multiple comments on same line" do
+              let(:source) { "<%# comment1 %><%# comment2 %>" }
+              # All comments should be rendered
+              let(:expected) { "  # comment1     # comment2   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with multiple comments followed by code" do
+              let(:source) { "<%# comment1 %><%# comment2 %><%= value %>" }
+              # All comments are ignored when followed by code
+              let(:expected) { "                                  value   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+          end
         end
       end
     end
