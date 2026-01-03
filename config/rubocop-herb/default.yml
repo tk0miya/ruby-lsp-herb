@@ -11,6 +11,16 @@ Layout/BlockAlignment:
   Exclude:
     - "**/*.html.erb"
 
+# ERB comment to Ruby comment conversion shifts column position
+Layout/CommentIndentation:
+  Exclude:
+    - "**/*.html.erb"
+
+# ERB tags have different lengths, making end alignment appear incorrect
+Layout/EndAlignment:
+  Exclude:
+    - "**/*.html.erb"
+
 # Whitespace padding preserves character positions but creates extra spaces
 Layout/ExtraSpacing:
   Exclude:
