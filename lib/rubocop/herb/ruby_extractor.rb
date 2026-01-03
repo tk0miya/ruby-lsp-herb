@@ -10,7 +10,6 @@ module RuboCop
     # linting of Ruby code embedded in ERB files.
     class RubyExtractor
       SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
-      DO_BLOCK_PATTERN = /\bdo(\s*\|[^|]*\|)?\s*\z/ #: Regexp
 
       # Character codes for byte manipulation
       LF = 10 #: Integer
@@ -97,7 +96,7 @@ module RuboCop
         content_bytes = node.content.value.bytes
         result_bytes[from, content_bytes.length] = content_bytes
 
-        result_bytes[semicolon_position(node)] = SEMICOLON if needs_semicolon?(node)
+        result_bytes[semicolon_position(node)] = SEMICOLON
       end
 
       # @rbs node: untyped
@@ -129,11 +128,6 @@ module RuboCop
 
         end_line = node.location.end.line
         candidates.take_while { |n| n.location.start.line == end_line }
-      end
-
-      # @rbs node: untyped
-      def needs_semicolon?(node) #: bool
-        !node.content.value.match?(DO_BLOCK_PATTERN)
       end
 
       # @rbs node: untyped
