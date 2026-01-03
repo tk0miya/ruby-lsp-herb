@@ -7,6 +7,7 @@
         "Lsp",
         "offences",
         "popen",
+        "Rakefile",
         "readlines",
         "rstrip",
         "rubocop",

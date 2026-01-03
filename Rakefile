@@ -9,4 +9,10 @@ require "rubocop/rake_task"
 
 RuboCop::RakeTask.new
 
-task default: %i[spec rubocop]
+desc "Run Steep type checking"
+task :steep do
+  sh "bundle exec rbs collection install --frozen"
+  sh "bundle exec steep check"
+end
+
+task default: %i[spec rubocop steep]
