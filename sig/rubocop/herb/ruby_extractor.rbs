@@ -8,8 +8,6 @@ module RuboCop
     class RubyExtractor
       SUPPORTED_EXTENSIONS: Array[String]
 
-      DO_BLOCK_PATTERN: Regexp
-
       # Character codes for byte manipulation
       LF: Integer
 
@@ -58,9 +56,6 @@ module RuboCop
       # @rbs node: untyped
       # @rbs candidates: Array[untyped]?
       def following_nodes_on_same_line: (untyped node, Array[untyped]? candidates) -> Array[untyped]
-
-      # @rbs node: untyped
-      def needs_semicolon?: (untyped node) -> bool
 
       # @rbs node: untyped
       def semicolon_position: (untyped node) -> Integer

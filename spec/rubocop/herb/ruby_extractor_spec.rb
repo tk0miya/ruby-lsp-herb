@@ -103,15 +103,14 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
             context "with do block" do
               let(:source) { "<% items.each do |item| %><%= item.name %><% end %>" }
-              # No semicolon after 'do |item|'
-              let(:expected) { "   items.each do |item|       item.name;     end;  " }
+              let(:expected) { "   items.each do |item|;      item.name;     end;  " }
 
               it_behaves_like "extracts Ruby code"
             end
 
             context "with do block without params" do
               let(:source) { "<% loop do %><%= x %><% end %>" }
-              let(:expected) { "   loop do       x;     end;  " }
+              let(:expected) { "   loop do;      x;     end;  " }
 
               it_behaves_like "extracts Ruby code"
             end
