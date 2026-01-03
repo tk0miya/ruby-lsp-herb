@@ -1,7 +1,14 @@
 # Default RuboCop configuration for ERB files
+#
+# NOTE: Rules should be listed in ASCII order (except AllCops which comes first)
 
 AllCops:
   Include:
+    - "**/*.html.erb"
+
+# Block alignment differs due to ERB tag length differences (<%= vs <%)
+Layout/BlockAlignment:
+  Exclude:
     - "**/*.html.erb"
 
 # Whitespace padding preserves character positions but creates extra spaces
@@ -39,11 +46,6 @@ Layout/TrailingWhitespace:
   Exclude:
     - "**/*.html.erb"
 
-# ERB code fragments may not have explicit return values
-Lint/Void:
-  Exclude:
-    - "**/*.html.erb"
-
 # Control flow bodies may contain only HTML (no Ruby code)
 Lint/EmptyConditionalBody:
   Exclude:
@@ -54,13 +56,18 @@ Lint/EmptyWhen:
   Exclude:
     - "**/*.html.erb"
 
-# ERB files don't have frozen string literal comments
-Style/FrozenStringLiteralComment:
+# ERB code fragments may not have explicit return values
+Lint/Void:
   Exclude:
     - "**/*.html.erb"
 
 # Else branches may contain only HTML (no Ruby code)
 Style/EmptyElse:
+  Exclude:
+    - "**/*.html.erb"
+
+# ERB files don't have frozen string literal comments
+Style/FrozenStringLiteralComment:
   Exclude:
     - "**/*.html.erb"
 
