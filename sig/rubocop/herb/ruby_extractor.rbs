@@ -10,6 +10,17 @@ module RuboCop
 
       DO_BLOCK_PATTERN: Regexp
 
+      # Character codes for byte manipulation
+      LF: Integer
+
+      CR: Integer
+
+      SPACE: Integer
+
+      HASH: Integer
+
+      SEMICOLON: Integer
+
       attr_reader processed_source: RuboCop::ProcessedSource
 
       # @rbs processed_source: RuboCop::ProcessedSource

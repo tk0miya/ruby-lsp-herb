@@ -12,6 +12,13 @@ module RuboCop
       SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
       DO_BLOCK_PATTERN = /\bdo(\s*\|[^|]*\|)?\s*\z/ #: Regexp
 
+      # Character codes for byte manipulation
+      LF = 10 #: Integer
+      CR = 13 #: Integer
+      SPACE = 32 #: Integer
+      HASH = 35 #: Integer
+      SEMICOLON = 59 #: Integer
+
       attr_reader :processed_source #: RuboCop::ProcessedSource
 
       class << self
@@ -66,7 +73,7 @@ module RuboCop
       # @rbs erb_nodes: Array[untyped]
       def build_whitespace_padded_source(original_source, erb_nodes) #: String
         # Initialize with spaces (preserve newlines)
-        result_bytes = original_source.bytes.map { |b| [10, 13].include?(b) ? b : 32 }
+        result_bytes = original_source.bytes.map { |b| [LF, CR].include?(b) ? b : SPACE }
 
         # Copy Ruby code from ERB nodes
         erb_nodes.each_with_index do |node, idx|
@@ -90,7 +97,7 @@ module RuboCop
         content_bytes = node.content.value.bytes
         result_bytes[from, content_bytes.length] = content_bytes
 
-        result_bytes[semicolon_position(node)] = 59 if needs_semicolon?(node) # ';'
+        result_bytes[semicolon_position(node)] = SEMICOLON if needs_semicolon?(node)
       end
 
       # @rbs node: untyped
@@ -101,7 +108,7 @@ module RuboCop
         return unless content
 
         tag_start = node.tag_opening.range.from
-        result_bytes[tag_start + 2] = 35 # '#'
+        result_bytes[tag_start + 2] = HASH
 
         from = node.content.range.from
         content_bytes = content.bytes
