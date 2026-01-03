@@ -32,9 +32,9 @@ module RuboCop
       def build_whitespace_padded_source: (String original_source, Array[untyped] erb_nodes) -> String
 
       # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs _following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
-      def insert_ruby_code: (untyped node, Array[untyped] following_nodes, Array[Integer] result_bytes) -> void
+      def insert_ruby_code: (untyped node, untyped _following_nodes, Array[Integer] result_bytes) -> void
 
       # @rbs node: untyped
       # @rbs following_nodes: Array[untyped]
@@ -44,16 +44,12 @@ module RuboCop
       # @rbs node: untyped
       def comment_node?: (untyped node) -> bool
 
-      # @rbs content: String
-      def ends_with_do_block?: (String content) -> bool
-
       # @rbs node: untyped
       # @rbs candidates: Array[untyped]?
       def following_nodes_on_same_line: (untyped node, Array[untyped]? candidates) -> Array[untyped]
 
       # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
-      def needs_semicolon?: (untyped node, Array[untyped] following_nodes) -> bool
+      def needs_semicolon?: (untyped node) -> bool
 
       # @rbs node: untyped
       def semicolon_position: (untyped node) -> Integer

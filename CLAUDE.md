@@ -62,7 +62,7 @@ The project uses Steep with RBS inline annotations. Type signatures are in `sig/
 
 When modifying files, regenerate RBS signatures by running:
 ```bash
-bundle exec rbs-inline --opt-out --output sig/ [filename]
+bundle exec rbs-inline --opt-out --output=sig/ [filename]
 ```
 
 ## Testing Guidelines

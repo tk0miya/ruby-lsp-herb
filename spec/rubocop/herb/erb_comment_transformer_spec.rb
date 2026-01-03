@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "rubocop"
-require "ruby_lsp_herb"
+require "ruby-lsp-herb"
 
 RSpec.describe RuboCop::Herb::ERBCommentTransformer do
   describe ".call" do

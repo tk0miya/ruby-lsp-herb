@@ -23,7 +23,9 @@
       "Bash(bundle exec rake:*)",
       "WebFetch(domain:rubydoc.info)",
       "Bash(find:*)",
-      "Bash(bundle exec steep:*)"
+      "Bash(bundle exec steep:*)",
+      "Bash(ls:*)",
+      "Bash(git status:*)"
     ]
   }
 }

@@ -2,7 +2,7 @@
 
 require "rubocop"
 require "rubocop/lsp/stdin_runner"
-require "ruby_lsp_herb"
+require "ruby-lsp-herb"
 
 RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable RSpec/DescribeClass
   let(:config_store) do

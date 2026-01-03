@@ -83,14 +83,14 @@ module RuboCop
       end
 
       # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs _following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
-      def insert_ruby_code(node, following_nodes, result_bytes) #: void
+      def insert_ruby_code(node, _following_nodes, result_bytes) #: void
         from = node.content.range.from
         content_bytes = node.content.value.bytes
         result_bytes[from, content_bytes.length] = content_bytes
 
-        result_bytes[semicolon_position(node)] = 59 if needs_semicolon?(node, following_nodes) # ';'
+        result_bytes[semicolon_position(node)] = 59 if needs_semicolon?(node) # ';'
       end
 
       # @rbs node: untyped
@@ -115,11 +115,6 @@ module RuboCop
         node.tag_opening.value == "<%#"
       end
 
-      # @rbs content: String
-      def ends_with_do_block?(content) #: bool
-        content.match?(DO_BLOCK_PATTERN)
-      end
-
       # @rbs node: untyped
       # @rbs candidates: Array[untyped]?
       def following_nodes_on_same_line(node, candidates) #: Array[untyped]
@@ -130,12 +125,8 @@ module RuboCop
       end
 
       # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
-      def needs_semicolon?(node, following_nodes) #: bool
-        return false if following_nodes.empty?
-        return false if ends_with_do_block?(node.content.value)
-
-        true
+      def needs_semicolon?(node) #: bool
+        !node.content.value.match?(DO_BLOCK_PATTERN)
       end
 
       # @rbs node: untyped
