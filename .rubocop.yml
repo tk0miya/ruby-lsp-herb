@@ -9,6 +9,10 @@ plugins:
 Layout/LeadingCommentSpace:
   AllowRBSInlineAnnotation: true
 
+Naming/FileName:
+  Exclude:
+    - "lib/ruby-lsp-herb.rb"
+
 Metrics/AbcSize:
   Max: 20
 
