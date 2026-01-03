@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "herb"
+require_relative "block_placeholder"
 require_relative "erb_comment_transformer"
 
 module RuboCop
@@ -80,12 +81,25 @@ module RuboCop
 
           if comment_node?(node)
             insert_comment(node, following_nodes, result_bytes)
+          elsif node.is_a?(::Herb::AST::ERBBlockNode)
+            insert_block_code(node, erb_nodes[idx + 1], result_bytes)
           else
             insert_ruby_code(node, following_nodes, result_bytes)
           end
         end
 
         result_bytes.pack("C*").force_encoding(original_source.encoding)
+      end
+
+      # @rbs node: ::Herb::AST::ERBBlockNode
+      # @rbs next_node: untyped
+      # @rbs result_bytes: Array[Integer]
+      def insert_block_code(node, next_node, result_bytes) #: void
+        insert_ruby_code(node, [], result_bytes)
+        return unless next_node.is_a?(::Herb::AST::ERBEndNode)
+
+        placeholder = BlockPlaceholder.build(node, next_node, result_bytes)
+        result_bytes[placeholder.position, placeholder.content.length] = placeholder.content if placeholder
       end
 
       # @rbs node: untyped

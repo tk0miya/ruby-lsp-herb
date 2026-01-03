@@ -1,0 +1,57 @@
+# Generated from lib/rubocop/herb/block_placeholder.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Builds placeholder content for empty do blocks to prevent Lint/EmptyBlock warnings.
+    # Returns the position and content of the placeholder, or nil if not needed.
+    class BlockPlaceholder
+      LF: Integer
+
+      class Result < Data
+        attr_reader position(): Integer
+
+        attr_reader content(): Array[Integer]
+
+        def self.new: (Integer position, Array[Integer] content) -> instance
+                    | (position: Integer, content: Array[Integer]) -> instance
+
+        def self.members: () -> [ :position, :content ]
+
+        def members: () -> [ :position, :content ]
+      end
+
+      attr_reader block_node: ::Herb::AST::ERBBlockNode
+
+      attr_reader end_node: ::Herb::AST::ERBEndNode
+
+      attr_reader result_bytes: Array[Integer]
+
+      # @rbs block_node: ::Herb::AST::ERBBlockNode
+      # @rbs end_node: ::Herb::AST::ERBEndNode
+      # @rbs result_bytes: Array[Integer]
+      def self.build: (::Herb::AST::ERBBlockNode block_node, ::Herb::AST::ERBEndNode end_node, Array[Integer] result_bytes) -> Result?
+
+      # @rbs block_node: ::Herb::AST::ERBBlockNode
+      # @rbs end_node: ::Herb::AST::ERBEndNode
+      # @rbs result_bytes: Array[Integer]
+      def initialize: (::Herb::AST::ERBBlockNode block_node, ::Herb::AST::ERBEndNode end_node, Array[Integer] result_bytes) -> void
+
+      def build: () -> Result?
+
+      private
+
+      def start_pos: () -> Integer
+
+      def end_pos: () -> Integer
+
+      def source_bytes: () -> Array[Integer]
+
+      def offset: () -> Integer
+
+      def calculate_placeholder_length: () -> Integer
+
+      # @rbs length: Integer
+      def generate_placeholder: (Integer length) -> Array[Integer]
+    end
+  end
+end
