@@ -34,12 +34,20 @@ RSpec.describe RuboCop::Herb::BlockPlaceholder do
       end
     end
 
-    context "when there is exactly 3 characters of space (minimum valid)" do
+    context "when there is exactly 3 characters of space" do
       let(:source) { "<% items.each do |item| %>...<% end %>" }
 
-      it "returns a Result with empty placeholder" do
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when there is exactly 4 characters of space (minimum valid)" do
+      let(:source) { "<% items.each do |item| %>....<% end %>" }
+
+      it "returns a Result with nil; placeholder" do
         expect(subject).to be_a(described_class::Result)
-        expect(subject.content.pack("C*")).to eq("'';")
+        expect(subject.content.pack("C*")).to eq("nil;")
       end
     end
 
@@ -49,8 +57,7 @@ RSpec.describe RuboCop::Herb::BlockPlaceholder do
       it "returns a Result with position and content" do
         expect(subject).to be_a(described_class::Result)
         expect(subject.position).to eq(26) # Right after first %>
-        # 15 chars available (  <p>HTML</p>  ), minus 3 = 12 space placeholder
-        expect(subject.content.pack("C*")).to eq("'            ';")
+        expect(subject.content.pack("C*")).to eq("nil;")
       end
     end
 
@@ -60,8 +67,7 @@ RSpec.describe RuboCop::Herb::BlockPlaceholder do
       it "returns a Result with position and content" do
         expect(subject).to be_a(described_class::Result)
         expect(subject.position).to eq(27) # After first newline
-        expect(subject.content).to be_an(Array)
-        expect(subject.content.pack("C*")).to match(/^'.*';$/)
+        expect(subject.content.pack("C*")).to eq("nil;")
       end
     end
 
@@ -76,11 +82,9 @@ RSpec.describe RuboCop::Herb::BlockPlaceholder do
     context "when block content spans multiple lines with enough space" do
       let(:source) { "<% items.each do |item| %>\n          \n<% end %>" }
 
-      it "returns a Result with correct placeholder size" do
-        expect(subject).not_to be_nil
-        content_str = subject.content.pack("C*")
-        # 10 spaces available, minus 3 for quotes and semicolon = 7 space placeholder
-        expect(content_str).to eq("'       ';")
+      it "returns a Result with nil; placeholder" do
+        expect(subject).to be_a(described_class::Result)
+        expect(subject.content.pack("C*")).to eq("nil;")
       end
     end
   end

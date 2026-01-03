@@ -1,6 +1,6 @@
-    <%# JS 用 spinner 画像 %>
-
-<%- if controller_name != "sessions" %>
-  <%= link_to "Log in", new_session_path(resource_name) %>
-  <br>
-<% end -%>
+  <span class="margin-left-30 actions text-right mb-20">
+    <%= link_to download_internal_operators_path(q: params.to_unsafe_h[:q]), class: "btn btn-default csv-download submit" do %>
+      <i class="fa fa-download btn-icon"></i>
+      CSV
+    <% end %>
+  </span>

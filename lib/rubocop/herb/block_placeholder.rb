@@ -6,6 +6,7 @@ module RuboCop
     # Returns the position and content of the placeholder, or nil if not needed.
     class BlockPlaceholder
       LF = 10 #: Integer
+      PLACEHOLDER = "nil;".bytes.freeze #: Array[Integer]
 
       Result = Data.define(
         :position, #: Integer
@@ -33,10 +34,9 @@ module RuboCop
       end
 
       def build #: Result?
-        placeholder_length = calculate_placeholder_length
-        return nil if placeholder_length.negative?
+        return nil unless enough_space?
 
-        Result.new(position: start_pos + offset, content: generate_placeholder(placeholder_length))
+        Result.new(position: start_pos + offset, content: PLACEHOLDER)
       end
 
       private
@@ -65,17 +65,12 @@ module RuboCop
         end
       end
 
-      def calculate_placeholder_length #: Integer
+      def enough_space? #: bool
         bytes = source_bytes[offset...]
-        raise "calculate_placeholder_length out of bounds" unless bytes
+        raise "enough_space? out of bounds" unless bytes
 
-        available_space = bytes.index(LF) || bytes.length
-        available_space - 3
-      end
-
-      # @rbs length: Integer
-      def generate_placeholder(length) #: Array[Integer]
-        "'#{" " * length}';".bytes
+        available = bytes.index(LF) || bytes.length
+        available >= PLACEHOLDER.size
       end
     end
   end
