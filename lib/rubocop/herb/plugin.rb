@@ -9,8 +9,6 @@ module RuboCop
     # This plugin registers the RubyExtractor with RuboCop::Runner.ruby_extractors
     # to enable linting of Ruby code embedded in ERB templates.
     class Plugin < LintRoller::Plugin
-      CONFIG_PATH = File.expand_path("../../../config/rubocop-herb/default.yml", __dir__.to_s) #: String
-
       # @rbs config: Hash[String, untyped]
       def initialize(config = {}) #: void
         super
@@ -36,9 +34,9 @@ module RuboCop
         RuboCop::Runner.ruby_extractors.unshift(RubyExtractor)
 
         LintRoller::Rules.new(
-          type: :path,
+          type: :object,
           config_format: :rubocop,
-          value: CONFIG_PATH
+          value: Configuration.to_rubocop_config
         )
       end
     end

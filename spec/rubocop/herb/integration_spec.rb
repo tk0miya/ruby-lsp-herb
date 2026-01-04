@@ -3,20 +3,29 @@
 require "rubocop"
 require "rubocop/lsp/stdin_runner"
 require "ruby-lsp-herb"
+require "tempfile"
+require "yaml"
 
 RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable RSpec/DescribeClass
+  let(:config_file) do
+    Tempfile.new([".rubocop", ".yml"], Dir.pwd).tap do |f|
+      f.write(YAML.dump(RuboCop::Herb::Configuration.to_rubocop_config))
+      f.close
+    end
+  end
   let(:config_store) do
-    config_path = File.expand_path("../../../config/rubocop-herb/default.yml", __dir__)
-    RuboCop::ConfigStore.new.tap { |store| store.options_config = config_path }
+    RuboCop::ConfigStore.new.tap { |store| store.options_config = config_file.path }
   end
   let(:runner) { RuboCop::Lsp::StdinRunner.new(config_store) }
   let(:path) { "test.html.erb" }
 
   before do
+    RuboCop::Herb::Configuration.setup({})
     RuboCop::Lsp::StdinRunner.ruby_extractors.unshift(RuboCop::Herb::RubyExtractor)
   end
 
   after do
+    config_file.unlink
     RuboCop::Lsp::StdinRunner.ruby_extractors.delete(RuboCop::Herb::RubyExtractor)
   end
 

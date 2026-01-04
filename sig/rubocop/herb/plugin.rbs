@@ -6,8 +6,6 @@ module RuboCop
     # This plugin registers the RubyExtractor with RuboCop::Runner.ruby_extractors
     # to enable linting of Ruby code embedded in ERB templates.
     class Plugin < LintRoller::Plugin
-      CONFIG_PATH: String
-
       # @rbs config: Hash[String, untyped]
       def initialize: (?Hash[String, untyped] config) -> void
 

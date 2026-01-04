@@ -28,7 +28,8 @@
       "Bash(git status:*)",
       "Bash(ruby -rjson -e:*)",
       "Bash(bundle exec rbs:*)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(bundle info:*)"
     ]
   }
 }

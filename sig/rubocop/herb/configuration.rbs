@@ -9,11 +9,16 @@ module RuboCop
 
       self.@supported_extensions: Array[String]
 
+      # Cops to exclude from ERB files due to whitespace padding and ERB tag formatting
+      EXCLUDED_COPS: Array[String]
+
       # @rbs config: Hash[String, untyped]
       def self.setup: (Hash[String, untyped] config) -> void
 
       # @rbs path: String
       def self.supported_file?: (String path) -> bool
+
+      def self.to_rubocop_config: () -> Hash[String, untyped]
     end
   end
 end
