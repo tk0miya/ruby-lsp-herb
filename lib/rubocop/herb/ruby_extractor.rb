@@ -114,16 +114,11 @@ module RuboCop
       # @rbs following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
       def insert_comment(node, following_nodes, result_bytes) #: void
-        same_line_nodes = nodes_on_same_line(node, following_nodes)
-        content = ERBCommentTransformer.call(node, same_line_nodes)
-        return unless content
+        result = ERBCommentTransformer.call(node, following_nodes)
+        return unless result
 
-        tag_start = node.tag_opening.range.from
-        result_bytes[tag_start + 2] = HASH
-
-        from = node.content.range.from
-        content_bytes = content.bytes
-        result_bytes[from, content_bytes.length] = content_bytes
+        content_bytes = result.content.bytes
+        result_bytes[result.position, content_bytes.length] = content_bytes
       end
 
       # @rbs node: untyped
@@ -131,13 +126,6 @@ module RuboCop
         return false unless node.respond_to?(:tag_opening)
 
         node.tag_opening.value == "<%#"
-      end
-
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
-      def nodes_on_same_line(node, following_nodes) #: Array[untyped]
-        end_line = node.location.end.line
-        following_nodes.take_while { |n| n.location.start.line == end_line }
       end
 
       # @rbs code: String

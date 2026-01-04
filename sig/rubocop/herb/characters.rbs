@@ -9,14 +9,6 @@ module RuboCop
       CR: Integer
 
       SPACE: Integer
-
-      HASH: Integer
-
-      SEMICOLON: Integer
-
-      EQUALS: Integer
-
-      UNDERSCORE: Integer
     end
   end
 end

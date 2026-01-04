@@ -2,18 +2,46 @@
 
 module RuboCop
   module Herb
-    # Transforms ERB comment content to Ruby comment format.
-    # Returns the transformed content or nil if the comment cannot be transformed.
-    module ERBCommentTransformer
+    # Transforms ERB comment nodes into Ruby comment format.
+    # Returns the position and content for the transformation.
+    class ERBCommentTransformer
+      class Result < Data
+        attr_reader position(): Integer
+
+        attr_reader content(): String
+
+        def self.new: (Integer position, String content) -> instance
+                    | (position: Integer, content: String) -> instance
+
+        def self.members: () -> [ :position, :content ]
+
+        def members: () -> [ :position, :content ]
+      end
+
+      attr_reader node: untyped
+
+      attr_reader following_nodes: Array[untyped]
+
       # @rbs node: untyped
       # @rbs following_nodes: Array[untyped]
-      def self.call: (untyped node, Array[untyped] following_nodes) -> String?
-
-      # @rbs following_nodes: Array[untyped]
-      private def self.followed_by_code?: (Array[untyped] following_nodes) -> bool
+      def self.call: (untyped node, Array[untyped] following_nodes) -> Result?
 
       # @rbs node: untyped
-      private def self.comment_node?: (untyped node) -> bool
+      # @rbs following_nodes: Array[untyped]
+      def initialize: (untyped node, Array[untyped] following_nodes) -> void
+
+      def call: () -> Result?
+
+      private
+
+      def position: () -> Integer
+
+      def build_ruby_comment: () -> String?
+
+      def followed_by_code?: () -> bool
+
+      # @rbs node: untyped
+      def comment_node?: (untyped node) -> bool
     end
   end
 end
