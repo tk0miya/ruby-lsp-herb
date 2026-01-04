@@ -204,5 +204,22 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
         expect(cop_names).to eq([])
       end
     end
+
+    context "with multiple output tags before block-closing node" do
+      let(:source) do
+        <<~ERB
+          <% if condition %>
+            <%= foo %>
+            <%= bar %>
+          <% end %>
+        ERB
+      end
+
+      it "does not report Lint/Void" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq([])
+      end
+    end
   end
 end

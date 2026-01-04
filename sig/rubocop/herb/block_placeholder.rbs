@@ -5,7 +5,7 @@ module RuboCop
     # Builds placeholder content for empty do blocks to prevent Lint/EmptyBlock warnings.
     # Returns the position and content of the placeholder, or nil if not needed.
     class BlockPlaceholder
-      LF: Integer
+      include Characters
 
       PLACEHOLDER: Array[Integer]
 

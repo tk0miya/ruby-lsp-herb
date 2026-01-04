@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+require_relative "characters"
+
 module RuboCop
   module Herb
     # Builds placeholder content for empty do blocks to prevent Lint/EmptyBlock warnings.
     # Returns the position and content of the placeholder, or nil if not needed.
     class BlockPlaceholder
-      LF = 10 #: Integer
+      include Characters
+
       PLACEHOLDER = "nil;".bytes.freeze #: Array[Integer]
 
       Result = Data.define(

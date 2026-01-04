@@ -60,7 +60,14 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when it contains multiple ERB tags" do
             let(:source) { "<%= foo %>\n<%= bar %>" }
-            let(:expected) { "    foo;  \n    bar;  " }
+            let(:expected) { "_ = foo;  \n    bar;  " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
+          context "when multiple output tags before block-closing node" do
+            let(:source) { "<% if x %><%= foo %><%= bar %><% end %>" }
+            let(:expected) { "   if x;  _ = foo;      bar;     end;  " }
 
             it_behaves_like "extracts Ruby code"
           end
