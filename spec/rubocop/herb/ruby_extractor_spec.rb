@@ -126,6 +126,14 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
               it_behaves_like "extracts Ruby code"
             end
 
+            context "with unless block containing HTML" do
+              let(:source) { "<% unless condition %><span>text</span><% end %>" }
+              # Placeholder position should be after %> (position 22), not after transformed code
+              let(:expected) { "   unless condition;  _ = nil;            end;  " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
             context "with comment followed by code" do
               let(:source) { "<%# comment %><%= value %>" }
               # Comment is ignored, only code is extracted

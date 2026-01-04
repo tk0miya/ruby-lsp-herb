@@ -39,8 +39,9 @@ module RuboCop
       # @rbs start_result: Result
       # @rbs end_node: ::Herb::AST::erb_nodes
       def calculate_position(start_result, end_node) #: Integer?
-        content_length = start_result.code.bytesize
-        start_pos = start_result.position + content_length
+        return nil unless start_result.node
+
+        start_pos = start_result.node.tag_closing.range.to
         end_pos = end_node.tag_opening.range.from
 
         range_bytes = source_bytes[start_pos...end_pos]
