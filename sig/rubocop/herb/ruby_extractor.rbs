@@ -49,10 +49,6 @@ module RuboCop
       # @rbs node: untyped
       def comment_node?: (untyped node) -> bool
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
-      def nodes_on_same_line: (untyped node, Array[untyped] following_nodes) -> Array[untyped]
-
       # @rbs code: String
       def build_processed_source: (String code) -> RuboCop::ProcessedSource
 
