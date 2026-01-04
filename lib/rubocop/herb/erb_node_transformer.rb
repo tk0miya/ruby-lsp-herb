@@ -21,17 +21,17 @@ module RuboCop
         :content #: String
       )
 
-      attr_reader :node #: untyped
-      attr_reader :following_nodes #: Array[untyped]
+      attr_reader :node #: Herb::AST::erb_nodes
+      attr_reader :following_nodes #: Array[Herb::AST::erb_nodes]
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       def self.call(node, following_nodes) #: Result
         new(node, following_nodes).call
       end
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       def initialize(node, following_nodes) #: void
         @node = node
         @following_nodes = following_nodes
@@ -82,7 +82,7 @@ module RuboCop
         true
       end
 
-      # @rbs node: untyped
+      # @rbs node: Herb::AST::erb_nodes
       def elsif_node?(node) #: bool
         node.is_a?(::Herb::AST::ERBIfNode) && node.content.value.lstrip.start_with?("elsif")
       end

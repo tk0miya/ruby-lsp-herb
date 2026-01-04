@@ -20,17 +20,17 @@ module RuboCop
         def members: () -> [ :position, :content ]
       end
 
-      attr_reader node: untyped
+      attr_reader node: Herb::AST::erb_nodes
 
-      attr_reader following_nodes: Array[untyped]
+      attr_reader following_nodes: Array[Herb::AST::erb_nodes]
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
-      def self.call: (untyped node, Array[untyped] following_nodes) -> Result
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
+      def self.call: (Herb::AST::erb_nodes node, Array[Herb::AST::erb_nodes] following_nodes) -> Result
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
-      def initialize: (untyped node, Array[untyped] following_nodes) -> void
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
+      def initialize: (Herb::AST::erb_nodes node, Array[Herb::AST::erb_nodes] following_nodes) -> void
 
       def call: () -> Result
 
@@ -48,8 +48,8 @@ module RuboCop
 
       def followed_by_block_body?: () -> bool
 
-      # @rbs node: untyped
-      def elsif_node?: (untyped node) -> bool
+      # @rbs node: Herb::AST::erb_nodes
+      def elsif_node?: (Herb::AST::erb_nodes node) -> bool
     end
   end
 end

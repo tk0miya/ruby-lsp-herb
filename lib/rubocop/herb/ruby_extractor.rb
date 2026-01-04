@@ -67,7 +67,7 @@ module RuboCop
       end
 
       # @rbs original_source: String
-      # @rbs erb_nodes: Array[untyped]
+      # @rbs erb_nodes: Array[Herb::AST::erb_nodes]
       def build_whitespace_padded_source(original_source, erb_nodes) #: String
         # Initialize with spaces (preserve newlines)
         result_bytes = original_source.bytes.map { |b| [LF, CR].include?(b) ? b : SPACE }
@@ -89,7 +89,7 @@ module RuboCop
       end
 
       # @rbs node: ::Herb::AST::ERBBlockNode
-      # @rbs following_nodes: Array[untyped]
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       # @rbs result_bytes: Array[Integer]
       def insert_block_code(node, following_nodes, result_bytes) #: void
         insert_ruby_code(node, [], result_bytes)
@@ -101,8 +101,8 @@ module RuboCop
         result_bytes[placeholder.position, placeholder.content.length] = placeholder.content if placeholder
       end
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       # @rbs result_bytes: Array[Integer]
       def insert_ruby_code(node, following_nodes, result_bytes) #: void
         result = ERBNodeTransformer.call(node, following_nodes)
@@ -110,8 +110,8 @@ module RuboCop
         result_bytes[result.position, content_bytes.length] = content_bytes
       end
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       # @rbs result_bytes: Array[Integer]
       def insert_comment(node, following_nodes, result_bytes) #: void
         result = ERBCommentTransformer.call(node, following_nodes)
@@ -121,7 +121,7 @@ module RuboCop
         result_bytes[result.position, content_bytes.length] = content_bytes
       end
 
-      # @rbs node: untyped
+      # @rbs node: Herb::AST::erb_nodes
       def comment_node?(node) #: bool
         return false unless node.respond_to?(:tag_opening)
 
@@ -143,22 +143,22 @@ module RuboCop
 
       # Visitor class to collect ERB nodes from Herb AST
       class ErbNodeVisitor < ::Herb::Visitor
-        attr_reader :erb_nodes #: Array[untyped]
+        attr_reader :erb_nodes #: Array[Herb::AST::erb_nodes]
 
         def initialize #: void
           @erb_nodes = []
           super
         end
 
-        # @rbs node: untyped
+        # @rbs node: Herb::AST::nodes
         def visit_child_nodes(node) #: void
-          @erb_nodes << node if erb_node?(node)
+          @erb_nodes << node if erb_node?(node) # steep:ignore
           super
         end
 
         private
 
-        # @rbs node: untyped
+        # @rbs node: Herb::AST::nodes
         def erb_node?(node) #: bool
           node.node_name.start_with?("ERB")
         end

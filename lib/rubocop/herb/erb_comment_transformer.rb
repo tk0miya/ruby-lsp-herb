@@ -10,17 +10,17 @@ module RuboCop
         :content #: String
       )
 
-      attr_reader :node #: untyped
-      attr_reader :following_nodes #: Array[untyped]
+      attr_reader :node #: Herb::AST::erb_nodes
+      attr_reader :following_nodes #: Array[Herb::AST::erb_nodes]
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       def self.call(node, following_nodes) #: Result?
         new(node, following_nodes).call
       end
 
-      # @rbs node: untyped
-      # @rbs following_nodes: Array[untyped]
+      # @rbs node: Herb::AST::erb_nodes
+      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
       def initialize(node, following_nodes) #: void
         @node = node
         @following_nodes = following_nodes
@@ -66,7 +66,7 @@ module RuboCop
           .any? { |n| !comment_node?(n) }
       end
 
-      # @rbs node: untyped
+      # @rbs node: Herb::AST::erb_nodes
       def comment_node?(node) #: bool
         return false unless node.respond_to?(:tag_opening)
 
