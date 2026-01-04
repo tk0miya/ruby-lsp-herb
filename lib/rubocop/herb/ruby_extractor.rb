@@ -16,11 +16,13 @@ module RuboCop
 
       SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
 
+      # @rbs! type result = Array[{ offset: Integer, processed_source: ProcessedSource }]?
+
       attr_reader :processed_source #: RuboCop::ProcessedSource
 
       class << self
         # @rbs processed_source: RuboCop::ProcessedSource
-        def call(processed_source) #: Array[{ offset: Integer, processed_source: RuboCop::ProcessedSource }]?
+        def call(processed_source) #: result
           new(processed_source).call
         end
       end
@@ -30,7 +32,7 @@ module RuboCop
         @processed_source = processed_source
       end
 
-      def call #: rubyExtractorResult
+      def call #: result
         return nil unless supported_file?
 
         parse_result = ::Herb.parse(processed_source.raw_source)

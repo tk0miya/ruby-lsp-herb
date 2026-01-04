@@ -10,15 +10,17 @@ module RuboCop
 
       SUPPORTED_EXTENSIONS: Array[String]
 
+      type result = Array[{ offset: Integer, processed_source: ProcessedSource }]?
+
       attr_reader processed_source: RuboCop::ProcessedSource
 
       # @rbs processed_source: RuboCop::ProcessedSource
-      def self.call: (RuboCop::ProcessedSource processed_source) -> Array[{ offset: Integer, processed_source: RuboCop::ProcessedSource }]?
+      def self.call: (RuboCop::ProcessedSource processed_source) -> result
 
       # @rbs processed_source: RuboCop::ProcessedSource
       def initialize: (RuboCop::ProcessedSource processed_source) -> void
 
-      def call: () -> rubyExtractorResult
+      def call: () -> result
 
       private
 
