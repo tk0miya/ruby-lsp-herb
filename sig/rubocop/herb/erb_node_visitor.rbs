@@ -1,0 +1,136 @@
+# Generated from lib/rubocop/herb/erb_node_visitor.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Result structure for transformed ERB nodes
+    class Result < Data
+      attr_reader position(): Integer
+
+      attr_reader tag_opening(): String
+
+      attr_reader tag_closing(): String
+
+      attr_reader prefix(): String
+
+      attr_reader content(): String
+
+      attr_reader location(): ::Herb::Location
+
+      def self.new: (Integer position, String tag_opening, String tag_closing, String prefix, String content, ::Herb::Location location) -> instance
+                  | (position: Integer, tag_opening: String, tag_closing: String, prefix: String, content: String, location: ::Herb::Location) -> instance
+
+      def self.members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location ]
+
+      def members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location ]
+    end
+
+    class Result
+      def code: () -> String
+    end
+
+    # Visitor class to transform ERB nodes from Herb AST
+    # Collects Result objects from AST traversal
+    class ErbNodeVisitor < ::Herb::Visitor
+      include BlockStackable
+
+      include RubyCommentBuilder
+
+      attr_reader placeholder_builder: PlaceholderBuilder
+
+      # @rbs source_bytes: Array[Integer]
+      def initialize: (Array[Integer] source_bytes) -> void
+
+      def results: () -> Array[Result]
+
+      # --- Content tags (<%= and <% and <%# are all ERBContentNode) ---
+      # @rbs node: ::Herb::AST::ERBContentNode
+      def visit_erb_content_node: (::Herb::AST::ERBContentNode node) -> void
+
+      # --- Block opening tags (push_new_block + push_erb_tag) ---
+      # @rbs node: ::Herb::AST::ERBBlockNode
+      def visit_erb_block_node: (::Herb::AST::ERBBlockNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBIfNode
+      def visit_erb_if_node: (::Herb::AST::ERBIfNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBUnlessNode
+      def visit_erb_unless_node: (::Herb::AST::ERBUnlessNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBCaseNode
+      def visit_erb_case_node: (::Herb::AST::ERBCaseNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBWhileNode
+      def visit_erb_while_node: (::Herb::AST::ERBWhileNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBUntilNode
+      def visit_erb_until_node: (::Herb::AST::ERBUntilNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBForNode
+      def visit_erb_for_node: (::Herb::AST::ERBForNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBBeginNode
+      def visit_erb_begin_node: (::Herb::AST::ERBBeginNode node) -> void
+
+      # --- Block closing tags ---
+      # @rbs node: ::Herb::AST::ERBEndNode
+      def visit_erb_end_node: (::Herb::AST::ERBEndNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBElseNode
+      def visit_erb_else_node: (::Herb::AST::ERBElseNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBWhenNode
+      def visit_erb_when_node: (::Herb::AST::ERBWhenNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBInNode
+      def visit_erb_in_node: (::Herb::AST::ERBInNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBRescueNode
+      def visit_erb_rescue_node: (::Herb::AST::ERBRescueNode node) -> void
+
+      # @rbs node: ::Herb::AST::ERBEnsureNode
+      def visit_erb_ensure_node: (::Herb::AST::ERBEnsureNode node) -> void
+
+      # --- Document node (root) ---
+      # @rbs node: ::Herb::AST::DocumentNode
+      def visit_document_node: (::Herb::AST::DocumentNode node) -> void
+
+      private
+
+      def finalize!: () -> void
+
+      # @rbs node: ::Herb::AST::erb_nodes
+      def output_tag?: (::Herb::AST::erb_nodes node) -> bool
+
+      # @rbs node: ::Herb::AST::erb_nodes
+      def comment_tag?: (::Herb::AST::erb_nodes node) -> bool
+
+      # @rbs node: ::Herb::AST::ERBIfNode
+      def elsif_node?: (::Herb::AST::ERBIfNode node) -> bool
+
+      # @rbs node: ::Herb::AST::erb_nodes
+      def push_output_tag: (::Herb::AST::erb_nodes node) -> void
+
+      # @rbs node: ::Herb::AST::erb_nodes
+      def push_erb_tag: (::Herb::AST::erb_nodes node) -> void
+
+      # @rbs node: ::Herb::AST::ERBContentNode
+      def push_comment_tag: (::Herb::AST::ERBContentNode node) -> void
+
+      # @rbs end_node: ::Herb::AST::erb_nodes
+      def close_block: (::Herb::AST::erb_nodes end_node) -> void
+
+      # @rbs node: ::Herb::AST::erb_nodes
+      def build_ruby_code: (::Herb::AST::erb_nodes node) -> String
+
+      def adjust_last_output_prefix!: () -> void
+
+      def filter_comments!: () -> void
+
+      # Checks if two results are on the same line.
+      # Assumes result_a comes before result_b in document order.
+      # @rbs result_a: Result
+      # @rbs result_b: Result
+      def same_line?: (Result result_a, Result result_b) -> bool
+    end
+  end
+end

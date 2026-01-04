@@ -25,45 +25,12 @@ module RuboCop
       # @rbs parse_result: Herb::ParseResult
       def build_unified_ruby_source: (Herb::ParseResult parse_result) -> String?
 
-      # @rbs original_source: String
-      # @rbs erb_nodes: Array[Herb::AST::erb_nodes]
-      def build_whitespace_padded_source: (String original_source, Array[Herb::AST::erb_nodes] erb_nodes) -> String
-
-      # @rbs node: ::Herb::AST::ERBBlockNode
-      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
-      # @rbs result_bytes: Array[Integer]
-      def insert_block_code: (::Herb::AST::ERBBlockNode node, Array[Herb::AST::erb_nodes] following_nodes, Array[Integer] result_bytes) -> void
-
-      # @rbs node: Herb::AST::erb_nodes
-      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
-      # @rbs result_bytes: Array[Integer]
-      def insert_ruby_code: (Herb::AST::erb_nodes node, Array[Herb::AST::erb_nodes] following_nodes, Array[Integer] result_bytes) -> void
-
-      # @rbs node: Herb::AST::erb_nodes
-      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
-      # @rbs result_bytes: Array[Integer]
-      def insert_comment: (Herb::AST::erb_nodes node, Array[Herb::AST::erb_nodes] following_nodes, Array[Integer] result_bytes) -> void
-
-      # @rbs node: Herb::AST::erb_nodes
-      def comment_node?: (Herb::AST::erb_nodes node) -> bool
+      # @rbs source_bytes: Array[Integer]
+      # @rbs results: Array[Result]
+      def build_result_bytes: (Array[Integer] source_bytes, Array[Result] results) -> Array[Integer]
 
       # @rbs code: String
       def build_processed_source: (String code) -> RuboCop::ProcessedSource
-
-      # Visitor class to collect ERB nodes from Herb AST
-      class ErbNodeVisitor < ::Herb::Visitor
-        attr_reader erb_nodes: Array[Herb::AST::erb_nodes]
-
-        def initialize: () -> void
-
-        # @rbs node: Herb::AST::nodes
-        def visit_child_nodes: (Herb::AST::nodes node) -> void
-
-        private
-
-        # @rbs node: Herb::AST::nodes
-        def erb_node?: (Herb::AST::nodes node) -> bool
-      end
     end
   end
 end

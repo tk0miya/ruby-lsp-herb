@@ -1,0 +1,30 @@
+# Generated from lib/rubocop/herb/placeholder_builder.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Builds placeholder Results for empty do blocks to prevent Lint/EmptyBlock warnings.
+    class PlaceholderBuilder
+      include Characters
+
+      PLACEHOLDER_CONTENT: String
+
+      attr_reader source_bytes: Array[Integer]
+
+      # @rbs source_bytes: Array[Integer]
+      def initialize: (Array[Integer] source_bytes) -> void
+
+      # @rbs start_result: Result
+      # @rbs end_node: ::Herb::AST::erb_nodes
+      def build: (Result start_result, ::Herb::AST::erb_nodes end_node) -> Result?
+
+      private
+
+      # @rbs start_result: Result
+      # @rbs end_node: ::Herb::AST::erb_nodes
+      def calculate_position: (Result start_result, ::Herb::AST::erb_nodes end_node) -> Integer?
+
+      # @rbs range_bytes: Array[Integer]
+      def calculate_offset: (Array[Integer] range_bytes) -> Integer?
+    end
+  end
+end

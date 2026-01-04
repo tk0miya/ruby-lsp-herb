@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 require "herb"
-require_relative "block_placeholder"
 require_relative "characters"
 require_relative "configuration"
-require_relative "erb_comment_transformer"
-require_relative "erb_node_transformer"
+require_relative "erb_node_visitor"
 
 module RuboCop
   module Herb
@@ -52,74 +50,28 @@ module RuboCop
       # @rbs parse_result: Herb::ParseResult
       def build_unified_ruby_source(parse_result) #: String?
         original_source = processed_source.raw_source
-        visitor = ErbNodeVisitor.new
+        source_bytes = original_source.bytes
+        visitor = ErbNodeVisitor.new(source_bytes)
         parse_result.visit(visitor)
 
-        return nil if visitor.erb_nodes.empty?
+        return nil if visitor.results.empty?
 
-        build_whitespace_padded_source(original_source, visitor.erb_nodes)
-      end
-
-      # @rbs original_source: String
-      # @rbs erb_nodes: Array[Herb::AST::erb_nodes]
-      def build_whitespace_padded_source(original_source, erb_nodes) #: String
-        # Initialize with spaces (preserve newlines)
-        result_bytes = original_source.bytes.map { |b| [LF, CR].include?(b) ? b : SPACE }
-
-        # Copy Ruby code from ERB nodes
-        erb_nodes.each_with_index do |node, idx|
-          following_nodes = erb_nodes[(idx + 1)..] || []
-
-          if comment_node?(node)
-            insert_comment(node, following_nodes, result_bytes)
-          elsif node.is_a?(::Herb::AST::ERBBlockNode)
-            insert_block_code(node, following_nodes, result_bytes)
-          else
-            insert_ruby_code(node, following_nodes, result_bytes)
-          end
-        end
-
+        result_bytes = build_result_bytes(source_bytes, visitor.results)
         result_bytes.pack("C*").force_encoding(original_source.encoding)
       end
 
-      # @rbs node: ::Herb::AST::ERBBlockNode
-      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
-      # @rbs result_bytes: Array[Integer]
-      def insert_block_code(node, following_nodes, result_bytes) #: void
-        insert_ruby_code(node, [], result_bytes)
+      # @rbs source_bytes: Array[Integer]
+      # @rbs results: Array[Result]
+      def build_result_bytes(source_bytes, results) #: Array[Integer]
+        result_bytes = source_bytes.map { |b| [LF, CR].include?(b) ? b : SPACE }
 
-        next_node = following_nodes.first
-        return unless next_node.is_a?(::Herb::AST::ERBEndNode)
+        results.each do |r|
+          r.code.bytes.each_with_index do |byte, idx|
+            result_bytes[r.position + idx] = byte
+          end
+        end
 
-        placeholder = BlockPlaceholder.build(node, next_node, result_bytes)
-        result_bytes[placeholder.position, placeholder.content.length] = placeholder.content if placeholder
-      end
-
-      # @rbs node: Herb::AST::erb_nodes
-      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
-      # @rbs result_bytes: Array[Integer]
-      def insert_ruby_code(node, following_nodes, result_bytes) #: void
-        result = ERBNodeTransformer.call(node, following_nodes)
-        content_bytes = result.content.bytes
-        result_bytes[result.position, content_bytes.length] = content_bytes
-      end
-
-      # @rbs node: Herb::AST::erb_nodes
-      # @rbs following_nodes: Array[Herb::AST::erb_nodes]
-      # @rbs result_bytes: Array[Integer]
-      def insert_comment(node, following_nodes, result_bytes) #: void
-        result = ERBCommentTransformer.call(node, following_nodes)
-        return unless result
-
-        content_bytes = result.content.bytes
-        result_bytes[result.position, content_bytes.length] = content_bytes
-      end
-
-      # @rbs node: Herb::AST::erb_nodes
-      def comment_node?(node) #: bool
-        return false unless node.respond_to?(:tag_opening)
-
-        node.tag_opening.value == "<%#"
+        result_bytes
       end
 
       # @rbs code: String
@@ -132,29 +84,6 @@ module RuboCop
         ).tap do |source|
           source.config = @processed_source.config
           source.registry = @processed_source.registry
-        end
-      end
-
-      # Visitor class to collect ERB nodes from Herb AST
-      class ErbNodeVisitor < ::Herb::Visitor
-        attr_reader :erb_nodes #: Array[Herb::AST::erb_nodes]
-
-        def initialize #: void
-          @erb_nodes = []
-          super
-        end
-
-        # @rbs node: Herb::AST::nodes
-        def visit_child_nodes(node) #: void
-          @erb_nodes << node if erb_node?(node) # steep:ignore
-          super
-        end
-
-        private
-
-        # @rbs node: Herb::AST::nodes
-        def erb_node?(node) #: bool
-          node.node_name.start_with?("ERB")
         end
       end
     end

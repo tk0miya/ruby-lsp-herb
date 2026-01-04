@@ -4,6 +4,10 @@ require "rubocop"
 require "ruby-lsp-herb"
 
 RSpec.describe RuboCop::Herb::RubyExtractor do
+  before do
+    RuboCop::Herb::Configuration.setup({})
+  end
+
   describe ".call" do
     subject { described_class.call(processed_source) }
 
@@ -157,8 +161,8 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when do block contains only HTML content" do
             let(:source) { "<% items.each do |item| %>\n  <p>HTML</p>\n<% end %>" }
-            # Placeholder nil; inserted to prevent Lint/EmptyBlock
-            let(:expected) { "   items.each do |item|;  \nnil;         \n   end;  " }
+            # Placeholder _ = nil; inserted to prevent Lint/EmptyBlock
+            let(:expected) { "   items.each do |item|;  \n_ = nil;     \n   end;  " }
 
             it_behaves_like "extracts Ruby code"
           end
@@ -184,19 +188,6 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
           end
         end
       end
-    end
-  end
-
-  describe RuboCop::Herb::RubyExtractor::ErbNodeVisitor do
-    subject { parse_result.visit(visitor) }
-
-    let(:parse_result) { Herb.parse(source) }
-    let(:visitor) { described_class.new }
-    let(:source) { "<%# comment %><%= foo %>\n<% bar %>" }
-
-    it "collects all ERB nodes" do
-      subject
-      expect(visitor.erb_nodes.size).to eq(3)
     end
   end
 end
