@@ -1,4 +1,6 @@
 module RuboCop
+  type rubyExtractorResult = Array[{ offset: Integer, processed_source: ProcessedSource }]?
+
   interface _RubyExtractor
     def call: (ProcessedSource) -> rubyExtractorResult
   end

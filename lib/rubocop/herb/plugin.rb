@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lint_roller"
+require_relative "configuration"
 
 module RuboCop
   module Herb
@@ -9,6 +10,12 @@ module RuboCop
     # to enable linting of Ruby code embedded in ERB templates.
     class Plugin < LintRoller::Plugin
       CONFIG_PATH = File.expand_path("../../../config/rubocop-herb/default.yml", __dir__.to_s) #: String
+
+      # @rbs config: Hash[String, untyped]
+      def initialize(config = {}) #: void
+        super
+        Configuration.setup(config)
+      end
 
       def about #: LintRoller::About
         LintRoller::About.new(

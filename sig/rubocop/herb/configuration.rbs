@@ -1,0 +1,19 @@
+# Generated from lib/rubocop/herb/configuration.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Configuration module for managing supported extensions.
+    # This module is shared between RuboCop Plugin and Ruby LSP Addon.
+    module Configuration
+      DEFAULT_EXTENSIONS: Array[String]
+
+      self.@supported_extensions: Array[String]
+
+      # @rbs config: Hash[String, untyped]
+      def self.setup: (Hash[String, untyped] config) -> void
+
+      # @rbs path: String
+      def self.supported_file?: (String path) -> bool
+    end
+  end
+end

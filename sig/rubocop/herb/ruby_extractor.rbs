@@ -8,8 +8,6 @@ module RuboCop
     class RubyExtractor
       include Characters
 
-      SUPPORTED_EXTENSIONS: Array[String]
-
       type result = Array[{ offset: Integer, processed_source: ProcessedSource }]?
 
       attr_reader processed_source: RuboCop::ProcessedSource
@@ -23,8 +21,6 @@ module RuboCop
       def call: () -> result
 
       private
-
-      def supported_file?: () -> bool
 
       # @rbs parse_result: Herb::ParseResult
       def build_unified_ruby_source: (Herb::ParseResult parse_result) -> String?

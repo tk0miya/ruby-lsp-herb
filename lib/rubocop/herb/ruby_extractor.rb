@@ -3,6 +3,7 @@
 require "herb"
 require_relative "block_placeholder"
 require_relative "characters"
+require_relative "configuration"
 require_relative "erb_comment_transformer"
 require_relative "erb_node_transformer"
 
@@ -13,8 +14,6 @@ module RuboCop
     # linting of Ruby code embedded in ERB files.
     class RubyExtractor
       include Characters
-
-      SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
 
       # @rbs! type result = Array[{ offset: Integer, processed_source: ProcessedSource }]?
 
@@ -33,7 +32,8 @@ module RuboCop
       end
 
       def call #: result
-        return nil unless supported_file?
+        path = processed_source.path
+        return nil unless path && Configuration.supported_file?(path)
 
         parse_result = ::Herb.parse(processed_source.raw_source)
         return [] if parse_result.errors.any?
@@ -48,14 +48,6 @@ module RuboCop
       end
 
       private
-
-      def supported_file? #: bool
-        return false unless processed_source.path
-
-        SUPPORTED_EXTENSIONS.any? do |ext|
-          processed_source.path.end_with?(ext)
-        end
-      end
 
       # @rbs parse_result: Herb::ParseResult
       def build_unified_ruby_source(parse_result) #: String?
