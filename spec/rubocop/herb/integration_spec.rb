@@ -197,6 +197,25 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       end
     end
 
+    context "with conditional inside loop (Style/Next candidate)" do
+      let(:source) do
+        <<~ERB
+          <% items.each do |item| %>
+            <%= item.name %>
+            <% if item.premium? %>
+              <div>Premium</div>
+            <% end %>
+          <% end %>
+        ERB
+      end
+
+      it "does not report Style/Next" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq([])
+      end
+    end
+
     context "with do block containing only HTML" do
       let(:source) do
         <<~ERB

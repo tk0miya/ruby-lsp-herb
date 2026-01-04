@@ -27,6 +27,7 @@ module RuboCop
         "Style/FrozenStringLiteralComment", # ERB files don't have frozen string literal comments
         "Style/IfUnlessModifier",         # Conditional HTML wrapping is extracted as single line
         "Style/IfWithSemicolon",          # Semicolons are inserted between ERB tags on the same line
+        "Style/Next",                     # `next unless` style is less readable than if/end in ERB templates
         "Style/Semicolon"                 # Semicolons are inserted between ERB tags on the same line
       ].freeze #: Array[String]
 
