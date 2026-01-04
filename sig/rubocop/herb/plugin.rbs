@@ -8,6 +8,9 @@ module RuboCop
     class Plugin < LintRoller::Plugin
       CONFIG_PATH: String
 
+      # @rbs config: Hash[String, untyped]
+      def initialize: (?Hash[String, untyped] config) -> void
+
       def about: () -> LintRoller::About
 
       # @rbs context: LintRoller::Context
