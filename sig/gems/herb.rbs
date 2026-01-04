@@ -1,0 +1,71 @@
+module Herb
+  module AST
+    # Union type for all nodes
+    type nodes = DocumentNode
+               | LiteralNode
+               | HTMLOpenTagNode
+               | HTMLCloseTagNode
+               | HTMLElementNode
+               | HTMLAttributeValueNode
+               | HTMLAttributeNameNode
+               | HTMLAttributeNode
+               | HTMLTextNode
+               | HTMLCommentNode
+               | HTMLDoctypeNode
+               | XMLDeclarationNode
+               | CDATANode
+               | WhitespaceNode
+               | ERBContentNode
+               | ERBEndNode
+               | ERBElseNode
+               | ERBIfNode
+               | ERBBlockNode
+               | ERBWhenNode
+               | ERBCaseNode
+               | ERBCaseMatchNode
+               | ERBWhileNode
+               | ERBUntilNode
+               | ERBForNode
+               | ERBRescueNode
+               | ERBEnsureNode
+               | ERBBeginNode
+               | ERBUnlessNode
+               | ERBYieldNode
+               | ERBInNode
+
+    # Union type for HTML/markup nodes
+    type html_nodes = DocumentNode
+                    | LiteralNode
+                    | HTMLOpenTagNode
+                    | HTMLCloseTagNode
+                    | HTMLElementNode
+                    | HTMLAttributeValueNode
+                    | HTMLAttributeNameNode
+                    | HTMLAttributeNode
+                    | HTMLTextNode
+                    | HTMLCommentNode
+                    | HTMLDoctypeNode
+                    | XMLDeclarationNode
+                    | CDATANode
+                    | WhitespaceNode
+
+    # Union type for ERB nodes
+    type erb_nodes = ERBContentNode
+                   | ERBEndNode
+                   | ERBElseNode
+                   | ERBIfNode
+                   | ERBBlockNode
+                   | ERBWhenNode
+                   | ERBCaseNode
+                   | ERBCaseMatchNode
+                   | ERBWhileNode
+                   | ERBUntilNode
+                   | ERBForNode
+                   | ERBRescueNode
+                   | ERBEnsureNode
+                   | ERBBeginNode
+                   | ERBUnlessNode
+                   | ERBYieldNode
+                   | ERBInNode
+  end
+end
