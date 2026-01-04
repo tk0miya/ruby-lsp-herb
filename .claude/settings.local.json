@@ -29,7 +29,8 @@
       "Bash(ruby -rjson -e:*)",
       "Bash(bundle exec rbs:*)",
       "Bash(xargs ls:*)",
-      "Bash(bundle info:*)"
+      "Bash(bundle info:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

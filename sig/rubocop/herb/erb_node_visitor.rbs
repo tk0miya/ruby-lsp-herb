@@ -16,12 +16,14 @@ module RuboCop
 
       attr_reader location(): ::Herb::Location
 
-      def self.new: (Integer position, String tag_opening, String tag_closing, String prefix, String content, ::Herb::Location location) -> instance
-                  | (position: Integer, tag_opening: String, tag_closing: String, prefix: String, content: String, location: ::Herb::Location) -> instance
+      attr_reader node(): ::Herb::AST::erb_nodes?
 
-      def self.members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location ]
+      def self.new: (Integer position, String tag_opening, String tag_closing, String prefix, String content, ::Herb::Location location, ::Herb::AST::erb_nodes? node) -> instance
+                  | (position: Integer, tag_opening: String, tag_closing: String, prefix: String, content: String, location: ::Herb::Location, node: ::Herb::AST::erb_nodes?) -> instance
 
-      def members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location ]
+      def self.members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location, :node ]
+
+      def members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location, :node ]
     end
 
     class Result
@@ -118,6 +120,9 @@ module RuboCop
 
       # @rbs end_node: ::Herb::AST::erb_nodes
       def close_block: (::Herb::AST::erb_nodes end_node) -> void
+
+      # @rbs result: Result
+      def case_node?: (Result result) -> bool
 
       # @rbs node: ::Herb::AST::erb_nodes
       def build_ruby_code: (::Herb::AST::erb_nodes node) -> String

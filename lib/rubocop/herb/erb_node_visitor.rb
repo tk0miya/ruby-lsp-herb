@@ -14,7 +14,8 @@ module RuboCop
       :tag_closing,   #: String - closing tag ("%>" or "" for placeholder)
       :prefix,        #: String - transformed prefix ("_ =" or "   " or "" for placeholder)
       :content,       #: String - Ruby code with semicolon added
-      :location       #: ::Herb::Location - location info for same-line checking
+      :location,      #: ::Herb::Location - location info for same-line checking
+      :node           #: ::Herb::AST::erb_nodes? - original AST node (nil for placeholders)
     )
 
     class Result
@@ -198,7 +199,8 @@ module RuboCop
           tag_closing: node.tag_closing.value,
           prefix: "_ =",
           content: build_ruby_code(node),
-          location: node.location
+          location: node.location,
+          node: node
         )
         push_node(result)
       end
@@ -211,7 +213,8 @@ module RuboCop
           tag_closing: node.tag_closing.value,
           prefix: " " * node.tag_opening.value.size,
           content: build_ruby_code(node),
-          location: node.location
+          location: node.location,
+          node: node
         )
         push_node(result)
       end
@@ -227,7 +230,8 @@ module RuboCop
           tag_closing: node.tag_closing.value,
           prefix: "  #",
           content: ruby_comment,
-          location: node.location
+          location: node.location,
+          node: node
         )
         push_node(result)
       end
@@ -240,12 +244,17 @@ module RuboCop
         block = pop_block
         current_block.concat(block)
 
-        if block.size == 1 && block.first
+        if block.size == 1 && block.first && !case_node?(block.first)
           placeholder = placeholder_builder.build(block.first, end_node)
           push_node(placeholder) if placeholder
         end
 
         push_erb_tag(end_node)
+      end
+
+      # @rbs result: Result
+      def case_node?(result) #: bool
+        result.node.is_a?(::Herb::AST::ERBCaseNode)
       end
 
       # @rbs node: ::Herb::AST::erb_nodes

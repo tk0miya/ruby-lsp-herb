@@ -29,7 +29,8 @@ module RuboCop
           tag_closing: "",
           prefix: "",
           content: PLACEHOLDER_CONTENT,
-          location: start_result.location
+          location: start_result.location,
+          node: nil
         )
       end
 
