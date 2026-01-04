@@ -5,6 +5,8 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in ruby-lsp-herb.gemspec
 gemspec
 
+# Required for Bundler 4.x compatibility (cgi became a bundled gem in Ruby 3.4+)
+gem "cgi"
 gem "irb"
 gem "rake", "~> 13.0"
 
