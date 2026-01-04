@@ -6,6 +6,7 @@
         "Erb",
         "KOMIYA",
         "Lsp",
+        "lstrip",
         "multibyte",
         "offences",
         "popen",

@@ -2,7 +2,9 @@
 
 require "herb"
 require_relative "block_placeholder"
+require_relative "characters"
 require_relative "erb_comment_transformer"
+require_relative "erb_node_transformer"
 
 module RuboCop
   module Herb
@@ -10,14 +12,9 @@ module RuboCop
     # This class is registered with RuboCop::Runner.ruby_extractors to enable
     # linting of Ruby code embedded in ERB files.
     class RubyExtractor
-      SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
+      include Characters
 
-      # Character codes for byte manipulation
-      LF = 10 #: Integer
-      CR = 13 #: Integer
-      SPACE = 32 #: Integer
-      HASH = 35 #: Integer
-      SEMICOLON = 59 #: Integer
+      SUPPORTED_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
 
       attr_reader :processed_source #: RuboCop::ProcessedSource
 
@@ -77,12 +74,12 @@ module RuboCop
 
         # Copy Ruby code from ERB nodes
         erb_nodes.each_with_index do |node, idx|
-          following_nodes = following_nodes_on_same_line(node, erb_nodes[(idx + 1)..])
+          following_nodes = erb_nodes[(idx + 1)..] || []
 
           if comment_node?(node)
             insert_comment(node, following_nodes, result_bytes)
           elsif node.is_a?(::Herb::AST::ERBBlockNode)
-            insert_block_code(node, erb_nodes[idx + 1], result_bytes)
+            insert_block_code(node, following_nodes, result_bytes)
           else
             insert_ruby_code(node, following_nodes, result_bytes)
           end
@@ -92,10 +89,12 @@ module RuboCop
       end
 
       # @rbs node: ::Herb::AST::ERBBlockNode
-      # @rbs next_node: untyped
+      # @rbs following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
-      def insert_block_code(node, next_node, result_bytes) #: void
+      def insert_block_code(node, following_nodes, result_bytes) #: void
         insert_ruby_code(node, [], result_bytes)
+
+        next_node = following_nodes.first
         return unless next_node.is_a?(::Herb::AST::ERBEndNode)
 
         placeholder = BlockPlaceholder.build(node, next_node, result_bytes)
@@ -103,21 +102,20 @@ module RuboCop
       end
 
       # @rbs node: untyped
-      # @rbs _following_nodes: Array[untyped]
+      # @rbs following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
-      def insert_ruby_code(node, _following_nodes, result_bytes) #: void
-        from = node.content.range.from
-        content_bytes = node.content.value.bytes
-        result_bytes[from, content_bytes.length] = content_bytes
-
-        result_bytes[semicolon_position(node)] = SEMICOLON
+      def insert_ruby_code(node, following_nodes, result_bytes) #: void
+        result = ERBNodeTransformer.call(node, following_nodes)
+        content_bytes = result.content.bytes
+        result_bytes[result.position, content_bytes.length] = content_bytes
       end
 
       # @rbs node: untyped
       # @rbs following_nodes: Array[untyped]
       # @rbs result_bytes: Array[Integer]
       def insert_comment(node, following_nodes, result_bytes) #: void
-        content = ERBCommentTransformer.call(node, following_nodes)
+        same_line_nodes = nodes_on_same_line(node, following_nodes)
+        content = ERBCommentTransformer.call(node, same_line_nodes)
         return unless content
 
         tag_start = node.tag_opening.range.from
@@ -136,19 +134,10 @@ module RuboCop
       end
 
       # @rbs node: untyped
-      # @rbs candidates: Array[untyped]?
-      def following_nodes_on_same_line(node, candidates) #: Array[untyped]
-        return [] unless candidates
-
+      # @rbs following_nodes: Array[untyped]
+      def nodes_on_same_line(node, following_nodes) #: Array[untyped]
         end_line = node.location.end.line
-        candidates.take_while { |n| n.location.start.line == end_line }
-      end
-
-      # @rbs node: untyped
-      def semicolon_position(node) #: Integer
-        content = node.content.value
-        trailing_spaces = content.length - content.rstrip.length
-        node.content.range.to - trailing_spaces
+        following_nodes.take_while { |n| n.location.start.line == end_line }
       end
 
       # @rbs code: String

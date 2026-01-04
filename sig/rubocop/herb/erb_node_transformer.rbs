@@ -1,0 +1,55 @@
+# Generated from lib/rubocop/herb/erb_node_transformer.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Transforms ERB nodes into Ruby code with proper formatting.
+    # Returns the position and content for the transformation.
+    class ERBNodeTransformer
+      BLOCK_CLOSING_NODES: Array[class]
+
+      class Result < Data
+        attr_reader position(): Integer
+
+        attr_reader content(): String
+
+        def self.new: (Integer position, String content) -> instance
+                    | (position: Integer, content: String) -> instance
+
+        def self.members: () -> [ :position, :content ]
+
+        def members: () -> [ :position, :content ]
+      end
+
+      attr_reader node: untyped
+
+      attr_reader following_nodes: Array[untyped]
+
+      # @rbs node: untyped
+      # @rbs following_nodes: Array[untyped]
+      def self.call: (untyped node, Array[untyped] following_nodes) -> Result
+
+      # @rbs node: untyped
+      # @rbs following_nodes: Array[untyped]
+      def initialize: (untyped node, Array[untyped] following_nodes) -> void
+
+      def call: () -> Result
+
+      private
+
+      def position: () -> Integer
+
+      def content: () -> String
+
+      def prefix: () -> String
+
+      def ruby_code: () -> String
+
+      def output_tag?: () -> bool
+
+      def followed_by_block_body?: () -> bool
+
+      # @rbs node: untyped
+      def elsif_node?: (untyped node) -> bool
+    end
+  end
+end

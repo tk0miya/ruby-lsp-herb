@@ -66,11 +66,6 @@ Lint/EmptyWhen:
   Exclude:
     - "**/*.html.erb"
 
-# ERB code fragments may not have explicit return values
-Lint/Void:
-  Exclude:
-    - "**/*.html.erb"
-
 # Else branches may contain only HTML (no Ruby code)
 Style/EmptyElse:
   Exclude:

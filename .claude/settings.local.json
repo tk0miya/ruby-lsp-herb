@@ -25,7 +25,8 @@
       "Bash(find:*)",
       "Bash(bundle exec steep:*)",
       "Bash(ls:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(ruby -rjson -e:*)"
     ]
   }
 }
