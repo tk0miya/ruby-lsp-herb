@@ -105,6 +105,18 @@ This runs `spec`, `rubocop`, and `steep` tasks to ensure code quality.
 
 ## Development Tools
 
+### RuboCop ERB Linting
+
+To test RuboCop linting on ERB templates with the plugin:
+
+```bash
+# Lint ERB via stdin
+echo '<% if user %><%= user.name %><% end %>' | bundle exec rubocop --plugin ruby-lsp-herb --stdin test.html.erb
+
+# Lint an ERB file
+bundle exec rubocop --plugin ruby-lsp-herb path/to/file.html.erb
+```
+
 ### Ruby Extractor Debug Script
 
 To inspect extracted Ruby code from ERB templates (useful for debugging RubyExtractor):
