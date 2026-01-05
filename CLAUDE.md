@@ -100,3 +100,19 @@ This runs `spec`, `rubocop`, and `steep` tasks to ensure code quality.
 - Minimum required: Ruby 3.1.0
 - CI runs on: Ruby 3.4.7
 - Target version for RuboCop: 3.1
+
+## Development Tools
+
+### Ruby Extractor Debug Script
+
+To inspect extracted Ruby code from ERB templates (useful for debugging RubyExtractor):
+
+```bash
+# Pass ERB source as argument
+bundle exec ruby bin/extract_ruby.rb '<% if condition %><span>text</span><% end %>'
+
+# Or via stdin
+echo '<% if condition %><span>text</span><% end %>' | bundle exec ruby bin/extract_ruby.rb
+```
+
+This script is for development only and is not included in the gem package.
