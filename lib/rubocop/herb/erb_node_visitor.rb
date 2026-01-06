@@ -216,7 +216,7 @@ module RuboCop
           prefix: "_ =",
           content: build_ruby_code(node),
           location: node.location,
-          node: node
+          node:
         )
         push_node(result)
       end
@@ -230,7 +230,7 @@ module RuboCop
           prefix: " " * node.tag_opening.value.size,
           content: build_ruby_code(node),
           location: node.location,
-          node: node
+          node:
         )
         push_node(result)
       end
@@ -247,7 +247,7 @@ module RuboCop
           prefix: "  #",
           content: ruby_comment,
           location: node.location,
-          node: node
+          node:
         )
         push_node(result)
       end

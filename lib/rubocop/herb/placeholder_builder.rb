@@ -24,7 +24,7 @@ module RuboCop
         return nil unless position
 
         Result.new(
-          position: position,
+          position:,
           tag_opening: "",
           tag_closing: "",
           prefix: "",
