@@ -26,6 +26,15 @@ module RuboCop
 
     class Result
       def code: () -> String
+
+      def output?: () -> bool
+
+      def comment?: () -> bool
+
+      # Checks if this result is on the same line as another result.
+      # Assumes self comes before other in document order.
+      # @rbs other: Result
+      def same_line?: (Result other) -> bool
     end
 
     # Visitor class to transform ERB nodes from Herb AST
@@ -125,12 +134,6 @@ module RuboCop
       def adjust_last_output_prefix!: () -> void
 
       def filter_comments!: () -> void
-
-      # Checks if two results are on the same line.
-      # Assumes result_a comes before result_b in document order.
-      # @rbs result_a: Result
-      # @rbs result_b: Result
-      def same_line?: (Result result_a, Result result_b) -> bool
     end
   end
 end
