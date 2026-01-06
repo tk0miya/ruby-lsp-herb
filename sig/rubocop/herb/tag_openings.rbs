@@ -1,0 +1,15 @@
+# Generated from lib/rubocop/herb/tag_openings.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Utility module for ERB tag opening detection
+    # Evaluates based on ERB semantics
+    module TagOpenings
+      # @rbs tag_opening: String
+      def self.output?: (String tag_opening) -> bool
+
+      # @rbs tag_opening: String
+      def self.comment?: (String tag_opening) -> bool
+    end
+  end
+end

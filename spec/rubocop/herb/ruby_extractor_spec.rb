@@ -194,6 +194,36 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
               expect(result[0][:processed_source].raw_source.bytesize).to eq(source.bytesize)
             end
           end
+
+          context "when it contains ERB tags with whitespace trim prefix" do
+            context "with <%- (statement tag)" do
+              let(:source) { "<%- foo -%>" }
+              let(:expected) { "    foo;   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with <%- containing Ruby comment" do
+              let(:source) { "<%- # TODO -%>" }
+              let(:expected) { "    # TODO;   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with mixed normal and whitespace trim tags" do
+              let(:source) { "<%= foo %>\n<%- bar -%>" }
+              let(:expected) { "_ = foo;  \n    bar;   " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+
+            context "with <%- inside block" do
+              let(:source) { "<% if x %><%- foo -%><% end %>" }
+              let(:expected) { "   if x;      foo;      end;  " }
+
+              it_behaves_like "extracts Ruby code"
+            end
+          end
         end
       end
     end

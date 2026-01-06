@@ -4,6 +4,7 @@ require "herb"
 require_relative "block_stackable"
 require_relative "placeholder_builder"
 require_relative "ruby_comment_builder"
+require_relative "tag_openings"
 
 module RuboCop
   module Herb
@@ -21,6 +22,21 @@ module RuboCop
     class Result
       def code #: String
         prefix + content
+      end
+
+      def output? #: bool
+        TagOpenings.output?(tag_opening)
+      end
+
+      def comment? #: bool
+        TagOpenings.comment?(tag_opening)
+      end
+
+      # Checks if this result is on the same line as another result.
+      # Assumes self comes before other in document order.
+      # @rbs other: Result
+      def same_line?(other) #: bool
+        location.end.line == other.location.start.line
       end
     end
 
@@ -178,12 +194,12 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def output_tag?(node) #: bool
-        node.tag_opening.value == "<%="
+        TagOpenings.output?(node.tag_opening.value)
       end
 
       # @rbs node: ::Herb::AST::erb_nodes
       def comment_tag?(node) #: bool
-        node.tag_opening.value == "<%#"
+        TagOpenings.comment?(node.tag_opening.value)
       end
 
       # @rbs node: ::Herb::AST::ERBIfNode
@@ -269,8 +285,7 @@ module RuboCop
 
       def adjust_last_output_prefix! #: void
         last_result = peek_node
-        return unless last_result
-        return unless last_result.tag_opening == "<%="
+        return unless last_result&.output?
 
         pop_node
         push_node(last_result.with(prefix: "   "))
@@ -278,21 +293,13 @@ module RuboCop
 
       def filter_comments! #: void
         current_block.reject!.with_index do |r, index|
-          next false unless r.tag_opening == "<%#"
+          next false unless r.comment?
 
           following_results = current_block[(index + 1)...] || []
           following_results.any? do |other|
-            same_line?(r, other) && other.tag_opening != "<%#"
+            r.same_line?(other) && !other.comment?
           end
         end
-      end
-
-      # Checks if two results are on the same line.
-      # Assumes result_a comes before result_b in document order.
-      # @rbs result_a: Result
-      # @rbs result_b: Result
-      def same_line?(result_a, result_b) #: bool
-        result_a.location.end.line == result_b.location.start.line
       end
     end
   end
