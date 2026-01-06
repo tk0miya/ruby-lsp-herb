@@ -52,6 +52,7 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
         context "when HTML contains ERB tags" do
           shared_examples "extracts Ruby code" do
             it "returns extracted Ruby code with whitespace padding" do
+              expect(source.size).to eq(expected.size)
               expect(subject).to match([
                                          {
                                            offset: 0,

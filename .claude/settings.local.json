@@ -1,17 +1,4 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "eval \"$(rbenv init - bash)\" && ruby -rcgi -S bundle install"
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "WebSearch",
@@ -43,7 +30,21 @@
       "Bash(bundle exec rbs:*)",
       "Bash(xargs ls:*)",
       "Bash(bundle info:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(bundle exec ruby bin/extract_ruby.rb:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "eval \"$(rbenv init - bash)\" && ruby -rcgi -S bundle install"
+          }
+        ]
+      }
     ]
   }
 }
