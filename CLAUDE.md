@@ -10,26 +10,28 @@ ruby-lsp-herb is a Ruby gem that provides Ruby LSP support for ERB templates usi
 
 ```bash
 # Run all tests
-bundle exec rake spec
+bin/rake spec
 
 # Run RuboCop linting
-bundle exec rake rubocop
+bin/rake rubocop
 
-# Run default task (spec + rubocop)
-bundle exec rake
+# Run default task (spec + rubocop + steep)
+bin/rake
 
 # Type checking with Steep
-bundle exec steep check
+bin/steep check
 
 # Process RBS inline annotations
-bundle exec rbs-inline
+bin/rbs-inline
 
 # Run a single test file
-bundle exec rspec spec/rubocop/herb/ruby_extractor_spec.rb
+bin/rspec spec/rubocop/herb/ruby_extractor_spec.rb
 
 # Run a specific test by line number
-bundle exec rspec spec/rubocop/herb/ruby_extractor_spec.rb:42
+bin/rspec spec/rubocop/herb/ruby_extractor_spec.rb:42
 ```
+
+Note: This project uses binstubs (`bin/`) instead of `bundle exec` for running commands.
 
 ## Architecture
 
@@ -58,11 +60,11 @@ bundle exec rspec spec/rubocop/herb/ruby_extractor_spec.rb:42
 
 ## Type Checking
 
-The project uses Steep with RBS inline annotations. Type signatures are in `sig/` directory. Run `bundle exec steep check` to verify types.
+The project uses Steep with RBS inline annotations. Type signatures are in `sig/` directory. Run `bin/steep check` to verify types.
 
 When modifying files, regenerate RBS signatures by running:
 ```bash
-bundle exec rbs-inline --opt-out --output=sig/ [filename]
+bin/rbs-inline --opt-out --output=sig/ [filename]
 ```
 
 ## Testing Guidelines
@@ -90,7 +92,7 @@ expect(cop_names).not_to include("Lint/EmptyBlock")
 
 After completing implementation, always run the full test suite and static analysis:
 ```bash
-bundle exec rake
+bin/rake
 ```
 
 This runs `spec`, `rubocop`, and `steep` tasks to ensure code quality.
@@ -109,10 +111,10 @@ To inspect extracted Ruby code from ERB templates (useful for debugging RubyExtr
 
 ```bash
 # Pass ERB source as argument
-bundle exec ruby bin/extract_ruby.rb '<% if condition %><span>text</span><% end %>'
+ruby bin/extract_ruby.rb '<% if condition %><span>text</span><% end %>'
 
 # Or via stdin
-echo '<% if condition %><span>text</span><% end %>' | bundle exec ruby bin/extract_ruby.rb
+echo '<% if condition %><span>text</span><% end %>' | ruby bin/extract_ruby.rb
 ```
 
 This script is for development only and is not included in the gem package.
