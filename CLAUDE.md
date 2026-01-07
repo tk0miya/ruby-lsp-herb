@@ -118,3 +118,13 @@ echo '<% if condition %><span>text</span><% end %>' | ruby bin/extract_ruby.rb
 ```
 
 This script is for development only and is not included in the gem package.
+
+## Code Review Guidelines
+
+When reviewing code, check for the following:
+
+- Use binstubs (`bin/`) instead of `bundle exec` for commands
+- Use `eq` matcher instead of `include` in integration tests
+- Avoid over-engineering (unnecessary features, refactoring)
+- Check for security issues (OWASP Top 10)
+- Commit messages accurately describe the changes
