@@ -26,8 +26,8 @@ module RuboCop
       def build_unified_ruby_source: (Herb::ParseResult parse_result) -> String?
 
       # @rbs source_bytes: Array[Integer]
-      # @rbs results: Array[Result]
-      def build_result_bytes: (Array[Integer] source_bytes, Array[Result] results) -> Array[Integer]
+      # @rbs results: Array[ErbNodeVisitor::Result]
+      def build_result_bytes: (Array[Integer] source_bytes, Array[ErbNodeVisitor::Result] results) -> Array[Integer]
 
       # @rbs code: String
       def build_processed_source: (String code) -> RuboCop::ProcessedSource

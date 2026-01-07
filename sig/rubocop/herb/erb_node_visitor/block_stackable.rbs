@@ -1,26 +1,28 @@
-# Generated from lib/rubocop/herb/block_stackable.rb with RBS::Inline
+# Generated from lib/rubocop/herb/erb_node_visitor/block_stackable.rb with RBS::Inline
 
 module RuboCop
   module Herb
-    # Provides stack-based block management for ERB node collection.
-    # Manages nested blocks using a stack of Result arrays.
-    module BlockStackable
-      attr_reader stack: Array[Array[Result]]
+    class ErbNodeVisitor
+      # Provides stack-based block management for ERB node collection.
+      # Manages nested blocks using a stack of Result arrays.
+      module BlockStackable
+        attr_reader stack: Array[Array[Result]]
 
-      def init_stack: () -> void
+        def init_stack: () -> void
 
-      def current_block: () -> Array[Result]
+        def current_block: () -> Array[Result]
 
-      def push_new_block: () -> void
+        def push_new_block: () -> void
 
-      def pop_block: () -> Array[Result]
+        def pop_block: () -> Array[Result]
 
-      # @rbs result: Result
-      def push_node: (Result result) -> void
+        # @rbs result: Result
+        def push_node: (Result result) -> void
 
-      def peek_node: () -> Result?
+        def peek_node: () -> Result?
 
-      def pop_node: () -> Result?
+        def pop_node: () -> Result?
+      end
     end
   end
 end

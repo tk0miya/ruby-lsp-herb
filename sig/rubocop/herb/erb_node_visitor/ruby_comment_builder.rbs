@@ -1,12 +1,14 @@
-# Generated from lib/rubocop/herb/ruby_comment_builder.rb with RBS::Inline
+# Generated from lib/rubocop/herb/erb_node_visitor/ruby_comment_builder.rb with RBS::Inline
 
 module RuboCop
   module Herb
-    # Builds Ruby comment strings from ERB comment nodes.
-    # Transforms multi-line ERB comments into valid Ruby comments.
-    module RubyCommentBuilder
-      # @rbs node: ::Herb::AST::ERBContentNode
-      def build_ruby_comment: (::Herb::AST::ERBContentNode node) -> String?
+    class ErbNodeVisitor
+      # Builds Ruby comment strings from ERB comment nodes.
+      # Transforms multi-line ERB comments into valid Ruby comments.
+      module RubyCommentBuilder
+        # @rbs node: ::Herb::AST::ERBContentNode
+        def build_ruby_comment: (::Herb::AST::ERBContentNode node) -> String?
+      end
     end
   end
 end

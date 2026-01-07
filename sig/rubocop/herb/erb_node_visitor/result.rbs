@@ -1,0 +1,44 @@
+# Generated from lib/rubocop/herb/erb_node_visitor/result.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    class ErbNodeVisitor
+      # Result structure for transformed ERB nodes
+      class Result < Data
+        attr_reader position(): Integer
+
+        attr_reader tag_opening(): String
+
+        attr_reader tag_closing(): String
+
+        attr_reader prefix(): String
+
+        attr_reader content(): String
+
+        attr_reader location(): ::Herb::Location
+
+        attr_reader node(): ::Herb::AST::erb_nodes?
+
+        def self.new: (Integer position, String tag_opening, String tag_closing, String prefix, String content, ::Herb::Location location, ::Herb::AST::erb_nodes? node) -> instance
+                    | (position: Integer, tag_opening: String, tag_closing: String, prefix: String, content: String, location: ::Herb::Location, node: ::Herb::AST::erb_nodes?) -> instance
+
+        def self.members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location, :node ]
+
+        def members: () -> [ :position, :tag_opening, :tag_closing, :prefix, :content, :location, :node ]
+      end
+
+      class Result
+        def code: () -> String
+
+        def output?: () -> bool
+
+        def comment?: () -> bool
+
+        # Checks if this result is on the same line as another result.
+        # Assumes self comes before other in document order.
+        # @rbs other: Result
+        def same_line?: (Result other) -> bool
+      end
+    end
+  end
+end

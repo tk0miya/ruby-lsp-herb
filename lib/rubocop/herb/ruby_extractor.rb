@@ -61,7 +61,7 @@ module RuboCop
       end
 
       # @rbs source_bytes: Array[Integer]
-      # @rbs results: Array[Result]
+      # @rbs results: Array[ErbNodeVisitor::Result]
       def build_result_bytes(source_bytes, results) #: Array[Integer]
         result_bytes = source_bytes.map { |b| [LF, CR].include?(b) ? b : SPACE }
 
