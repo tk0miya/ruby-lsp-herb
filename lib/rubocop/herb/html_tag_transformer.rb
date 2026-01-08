@@ -21,7 +21,7 @@ module RuboCop
       CLOSE_TAG_PATTERN = %r{\A</([a-zA-Z0-9]+)>\z}
 
       # Characters valid for Ruby identifiers (a-z, A-Z, 0-9, _)
-      IDENTIFIER_CHARS = (("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a + ["_"]).freeze
+      IDENTIFIER_CHARS = (("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a + ["_"]).freeze #: Array[String]
 
       attr_reader :config #: RuboCop::Config?
 

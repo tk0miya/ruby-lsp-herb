@@ -20,7 +20,7 @@ module RuboCop
       CLOSE_TAG_PATTERN: ::Regexp
 
       # Characters valid for Ruby identifiers (a-z, A-Z, 0-9, _)
-      IDENTIFIER_CHARS: untyped
+      IDENTIFIER_CHARS: Array[String]
 
       attr_reader config: RuboCop::Config?
 
