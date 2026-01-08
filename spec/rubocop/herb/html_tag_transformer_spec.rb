@@ -109,13 +109,15 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
   end
 
   describe "#transform_close_tag" do
-    subject { transformer.transform_close_tag(source, position:, location:) }
+    subject { transformer.transform_close_tag(source, position:, location:, open_tag_source:) }
 
     let(:position) { 0 }
+    let(:open_tag_source) { "<div>" }
 
     context "with simple close tag" do
       let(:source) { "</div>" }
-      let(:expected) { "div1; " }
+      # Hash of "<div>" maps to "G"
+      let(:expected) { "divG; " }
 
       it_behaves_like "transforms HTML tag"
     end
@@ -135,6 +137,37 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
       it "sets position in result" do
         expect(subject.position).to eq(15)
       end
+    end
+
+    context "without open_tag_source" do
+      let(:source) { "</div>" }
+      let(:open_tag_source) { nil }
+
+      it "uses fallback character '0'" do
+        expect(subject.content).to eq("div0; ")
+      end
+    end
+  end
+
+  describe "hash-based closing tags" do
+    it "produces identical closing tags for identical opening tags" do
+      result1 = transformer.transform_close_tag("</div>", position: 0, location:,
+                                                          open_tag_source: '<div id="foo">')
+      result2 = transformer.transform_close_tag("</div>", position: 0, location:,
+                                                          open_tag_source: '<div id="foo">')
+
+      expect(result1.content).to eq(result2.content)
+    end
+
+    it "produces different closing tags for different opening tags" do
+      result1 = transformer.transform_close_tag("</div>", position: 0, location:,
+                                                          open_tag_source: '<div id="foo">')
+      result2 = transformer.transform_close_tag("</div>", position: 0, location:,
+                                                          open_tag_source: '<div id="bar">')
+
+      # Different opening tags should typically produce different closing tags
+      # (though hash collisions are theoretically possible)
+      expect(result1.content).not_to eq(result2.content)
     end
   end
 

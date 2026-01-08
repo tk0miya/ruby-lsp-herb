@@ -56,7 +56,8 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
         context "when HTML contains no ERB tags" do
           let(:source) { "<html><body></body></html>" }
-          let(:expected) { "html; body; body1; html2; " }
+          # Hash-based closing tags: <html> -> v, <body> -> t
+          let(:expected) { "html; body; bodyt; htmlv; " }
 
           it_behaves_like "extracts Ruby code"
         end
@@ -92,7 +93,8 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when it contains HTML tags" do
             let(:source) { "<p><%= x %></p>" }
-            let(:expected) { "p; _ = x;  p1; " }
+            # Hash-based closing tag: <p> -> D
+            let(:expected) { "p; _ = x;  pD; " }
 
             it_behaves_like "extracts Ruby code"
           end
@@ -128,7 +130,8 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
             context "with unless block containing HTML" do
               let(:source) { "<% unless condition %><span>text</span><% end %>" }
-              let(:expected) { "   unless condition;  span;     span1;    end;  " }
+              # Hash-based closing tag: <span> -> a
+              let(:expected) { "   unless condition;  span;     spana;    end;  " }
 
               it_behaves_like "extracts Ruby code"
             end
@@ -168,14 +171,16 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when do block contains only HTML content" do
             let(:source) { "<% items.each do |item| %>\n  <p>HTML</p>\n<% end %>" }
-            let(:expected) { "   items.each do |item|;  \n  p;     p1; \n   end;  " }
+            # Hash-based closing tag: <p> -> D
+            let(:expected) { "   items.each do |item|;  \n  p;     pD; \n   end;  " }
 
             it_behaves_like "extracts Ruby code"
           end
 
           context "when do block contains HTML and Ruby" do
             let(:source) { "<% items.each do |item| %>\n  <p><%= item %></p>\n<% end %>" }
-            let(:expected) { "   items.each do |item|;  \n  p; _ = item;  p1; \n   end;  " }
+            # Hash-based closing tag: <p> -> D
+            let(:expected) { "   items.each do |item|;  \n  p; _ = item;  pD; \n   end;  " }
 
             it_behaves_like "extracts Ruby code"
           end

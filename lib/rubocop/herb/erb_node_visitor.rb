@@ -190,9 +190,12 @@ module RuboCop
       # --- HTML element nodes ---
       # @rbs node: ::Herb::AST::HTMLElementNode
       def visit_html_element_node(node) #: void
-        visit_html_open_tag(node.open_tag) if node.open_tag
+        open_tag_source = nil
+        open_tag_source = visit_html_open_tag(node.open_tag) if node.open_tag
         super
-        visit_html_close_tag(node.close_tag) if node.close_tag
+        return unless node.close_tag
+
+        visit_html_close_tag(node.close_tag, open_tag_source:)
       end
 
       # --- Document node (root) ---
@@ -210,20 +213,23 @@ module RuboCop
       end
 
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
-      def visit_html_open_tag(node) #: void
+      def visit_html_open_tag(node) #: String
         position = node.tag_opening.range.from
         source = bytes_to_string(position, node.tag_closing.range.to)
 
         result = html_tag_transformer.transform_open_tag(source, position:, location: node.location)
         push_node(result) if result
+        source
       end
 
       # @rbs node: ::Herb::AST::HTMLCloseTagNode
-      def visit_html_close_tag(node) #: void
+      # @rbs open_tag_source: String?
+      def visit_html_close_tag(node, open_tag_source:) #: void
         position = node.tag_opening.range.from
         source = bytes_to_string(position, node.tag_closing.range.to)
 
-        result = html_tag_transformer.transform_close_tag(source, position:, location: node.location)
+        result = html_tag_transformer.transform_close_tag(source, position:, location: node.location,
+                                                                  open_tag_source:)
         push_node(result) if result
       end
 

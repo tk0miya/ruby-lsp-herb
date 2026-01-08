@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "digest"
+
 module RuboCop
   module Herb
     # Class for transforming HTML tags to Ruby code while preserving byte length.
@@ -7,7 +9,10 @@ module RuboCop
     # Transformation rules:
     #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
     #   Opening tag (attrs):    <div id="x"> → 'div "d= x"; ' (12 bytes)
-    #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
+    #   Closing tag:            </div>       → "divX; "       (6 bytes, X is hash-based char)
+    #
+    # The closing tag character is determined by hashing the opening tag source,
+    # so identical opening tags produce identical closing tags.
     #
     # For multibyte characters, padding with spaces is used to preserve byte length:
     #   <div 属性="x"> → 'div "  性= x"; ' (属 is 3 bytes → " + 2 spaces)
@@ -15,14 +20,14 @@ module RuboCop
       OPEN_TAG_PATTERN = /\A<([a-zA-Z0-9]+)(\s*)(.*)>\z/m
       CLOSE_TAG_PATTERN = %r{\A</([a-zA-Z0-9]+)>\z}
 
-      attr_reader :config #: RuboCop::Config?
+      # Characters valid for Ruby identifiers (a-z, A-Z, 0-9, _)
+      IDENTIFIER_CHARS = (("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a + ["_"]).freeze
 
-      # @rbs @close_tag_counter: Integer
+      attr_reader :config #: RuboCop::Config?
 
       # @rbs config: RuboCop::Config?
       def initialize(config) #: void
         @config = config
-        @close_tag_counter = 0
       end
 
       # @rbs source: String
@@ -41,8 +46,10 @@ module RuboCop
       # @rbs source: String
       # @rbs position: Integer
       # @rbs location: untyped
-      def transform_close_tag(source, position:, location:) #: Result?
-        content = source.sub(CLOSE_TAG_PATTERN) { "#{::Regexp.last_match(1)}#{next_close_tag_count}; " }
+      # @rbs open_tag_source: String?
+      def transform_close_tag(source, position:, location:, open_tag_source:) #: Result?
+        suffix = hash_char(open_tag_source)
+        content = source.sub(CLOSE_TAG_PATTERN) { "#{::Regexp.last_match(1)}#{suffix}; " }
         return nil if content == source
 
         build_result(content, position, location)
@@ -50,8 +57,14 @@ module RuboCop
 
       private
 
-      def next_close_tag_count #: Integer
-        @close_tag_counter = (@close_tag_counter + 1) % 10
+      # Computes a single character hash from the source string.
+      # @rbs source: String?
+      def hash_char(source) #: String
+        return "0" unless source
+
+        digest = Digest::MD5.hexdigest(source)
+        index = digest.to_i(16) % IDENTIFIER_CHARS.size
+        IDENTIFIER_CHARS[index]
       end
 
       # @rbs attrs: String

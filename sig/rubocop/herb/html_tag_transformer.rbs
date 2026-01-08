@@ -7,7 +7,10 @@ module RuboCop
     # Transformation rules:
     #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
     #   Opening tag (attrs):    <div id="x"> → 'div "d= x"; ' (12 bytes)
-    #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
+    #   Closing tag:            </div>       → "divX; "       (6 bytes, X is hash-based char)
+    #
+    # The closing tag character is determined by hashing the opening tag source,
+    # so identical opening tags produce identical closing tags.
     #
     # For multibyte characters, padding with spaces is used to preserve byte length:
     #   <div 属性="x"> → 'div "  性= x"; ' (属 is 3 bytes → " + 2 spaces)
@@ -16,9 +19,10 @@ module RuboCop
 
       CLOSE_TAG_PATTERN: ::Regexp
 
-      attr_reader config: RuboCop::Config?
+      # Characters valid for Ruby identifiers (a-z, A-Z, 0-9, _)
+      IDENTIFIER_CHARS: untyped
 
-      @close_tag_counter: Integer
+      attr_reader config: RuboCop::Config?
 
       # @rbs config: RuboCop::Config?
       def initialize: (RuboCop::Config? config) -> void
@@ -31,11 +35,14 @@ module RuboCop
       # @rbs source: String
       # @rbs position: Integer
       # @rbs location: untyped
-      def transform_close_tag: (String source, position: Integer, location: untyped) -> Result?
+      # @rbs open_tag_source: String?
+      def transform_close_tag: (String source, position: Integer, location: untyped, open_tag_source: String?) -> Result?
 
       private
 
-      def next_close_tag_count: () -> Integer
+      # Computes a single character hash from the source string.
+      # @rbs source: String?
+      def hash_char: (String? source) -> String
 
       # @rbs attrs: String
       def transform_attrs: (String attrs) -> String

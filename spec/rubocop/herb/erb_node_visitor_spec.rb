@@ -312,8 +312,8 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
           expect(subject[0]).to have_attributes(position: 0, content: "div; ")
           # Second result is the ERB tag at position 5
           expect(subject[1]).to have_attributes(position: 5)
-          # Third result is the HTML close tag at position 15
-          expect(subject[2]).to have_attributes(position: 15, content: "div1; ")
+          # Third result is the HTML close tag at position 15 (hash of "<div>" -> "G")
+          expect(subject[2]).to have_attributes(position: 15, content: "divG; ")
         end
       end
 
