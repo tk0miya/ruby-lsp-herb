@@ -190,7 +190,6 @@ module RuboCop
       # --- HTML element nodes ---
       # @rbs node: ::Herb::AST::HTMLElementNode
       def visit_html_element_node(node) #: void
-        open_tag_source = nil
         open_tag_source = visit_html_open_tag(node.open_tag) if node.open_tag
         super
         return unless node.close_tag
