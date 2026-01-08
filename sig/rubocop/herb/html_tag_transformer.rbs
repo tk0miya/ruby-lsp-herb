@@ -1,0 +1,58 @@
+# Generated from lib/rubocop/herb/html_tag_transformer.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Class for transforming HTML tags to Ruby code while preserving byte length.
+    #
+    # Transformation rules:
+    #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
+    #   Opening tag (attrs):    <div id="x"> → 'div "d= x"; ' (12 bytes)
+    #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
+    #
+    # For multibyte characters, padding with spaces is used to preserve byte length:
+    #   <div 属性="x"> → 'div "  性= x"; ' (属 is 3 bytes → " + 2 spaces)
+    class HtmlTagTransformer
+      OPEN_TAG_PATTERN: ::Regexp
+
+      CLOSE_TAG_PATTERN: ::Regexp
+
+      attr_reader config: RuboCop::Config?
+
+      @close_tag_counter: Integer
+
+      # @rbs config: RuboCop::Config?
+      def initialize: (RuboCop::Config? config) -> void
+
+      # @rbs source: String
+      # @rbs position: Integer
+      # @rbs location: untyped
+      def transform_open_tag: (String source, position: Integer, location: untyped) -> Result?
+
+      # @rbs source: String
+      # @rbs position: Integer
+      # @rbs location: untyped
+      def transform_close_tag: (String source, position: Integer, location: untyped) -> Result?
+
+      private
+
+      def next_close_tag_count: () -> Integer
+
+      # @rbs attrs: String
+      def transform_attrs: (String attrs) -> String
+
+      # @rbs attrs: String
+      def transform_quoted_attrs: (String attrs) -> String
+
+      # Converts a character to a quote with padding to preserve byte length.
+      # @rbs char: String?
+      def convert_quote_char: (String? char) -> String
+
+      def preferred_quote: () -> String
+
+      # @rbs content: String
+      # @rbs position: Integer
+      # @rbs location: untyped
+      def build_result: (String content, Integer position, untyped location) -> Result
+    end
+  end
+end

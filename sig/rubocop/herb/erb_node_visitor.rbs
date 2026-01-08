@@ -48,8 +48,16 @@ module RuboCop
 
       attr_reader placeholder_builder: PlaceholderBuilder
 
+      attr_reader html_tag_transformer: HtmlTagTransformer
+
+      attr_reader source_bytes: Array[Integer]
+
+      attr_reader encoding: Encoding
+
       # @rbs source_bytes: Array[Integer]
-      def initialize: (Array[Integer] source_bytes) -> void
+      # @rbs encoding: Encoding
+      # @rbs config: RuboCop::Config?
+      def initialize: (Array[Integer] source_bytes, encoding: Encoding, config: RuboCop::Config?) -> void
 
       def results: () -> Array[Result]
 
@@ -101,6 +109,10 @@ module RuboCop
       # @rbs node: ::Herb::AST::ERBEnsureNode
       def visit_erb_ensure_node: (::Herb::AST::ERBEnsureNode node) -> void
 
+      # --- HTML element nodes ---
+      # @rbs node: ::Herb::AST::HTMLElementNode
+      def visit_html_element_node: (::Herb::AST::HTMLElementNode node) -> void
+
       # --- Document node (root) ---
       # @rbs node: ::Herb::AST::DocumentNode
       def visit_document_node: (::Herb::AST::DocumentNode node) -> void
@@ -135,6 +147,16 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def build_ruby_code: (::Herb::AST::erb_nodes node) -> String
+
+      # @rbs node: ::Herb::AST::HTMLOpenTagNode
+      def visit_html_open_tag: (::Herb::AST::HTMLOpenTagNode node) -> void
+
+      # @rbs node: ::Herb::AST::HTMLCloseTagNode
+      def visit_html_close_tag: (::Herb::AST::HTMLCloseTagNode node) -> void
+
+      # @rbs start_pos: Integer
+      # @rbs end_pos: Integer
+      def bytes_to_string: (Integer start_pos, Integer end_pos) -> String
 
       def adjust_last_output_prefix!: () -> void
 

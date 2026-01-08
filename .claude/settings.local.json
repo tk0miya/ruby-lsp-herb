@@ -31,7 +31,12 @@
       "Bash(xargs ls:*)",
       "Bash(bundle info:*)",
       "Bash(xargs:*)",
-      "Bash(bundle exec ruby bin/extract_ruby.rb:*)"
+      "Bash(bundle exec ruby bin/extract_ruby.rb:*)",
+      "Bash(bin/rspec:*)",
+      "Bash(bin/rake:*)",
+      "Bash(bin/rubocop:*)",
+      "Bash(bin/rbs-inline:*)",
+      "Bash(bin/steep check:*)"
     ]
   },
   "hooks": {

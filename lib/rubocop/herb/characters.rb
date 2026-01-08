@@ -7,6 +7,9 @@ module RuboCop
       LF = 10 #: Integer
       CR = 13 #: Integer
       SPACE = 32 #: Integer
+      SEMICOLON = 59 #: Integer
+      DOUBLE_QUOTE = 34 #: Integer
+      SINGLE_QUOTE = 39 #: Integer
     end
   end
 end

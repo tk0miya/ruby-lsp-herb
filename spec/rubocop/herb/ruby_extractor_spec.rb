@@ -41,28 +41,27 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
       end
 
       context "when HTML parsing succeeds" do
-        context "when HTML contains no ERB tags" do
-          let(:source) { "<html><body></body></html>" }
-
-          it "returns empty array" do
-            expect(subject).to eq([])
+        shared_examples "extracts Ruby code" do
+          it "returns extracted Ruby code with whitespace padding" do
+            expect(source.size).to eq(expected.size)
+            expect(subject).to match([
+                                       {
+                                         offset: 0,
+                                         processed_source: an_instance_of(RuboCop::ProcessedSource)
+                                                             .and(have_attributes(raw_source: expected))
+                                       }
+                                     ])
           end
         end
 
-        context "when HTML contains ERB tags" do
-          shared_examples "extracts Ruby code" do
-            it "returns extracted Ruby code with whitespace padding" do
-              expect(source.size).to eq(expected.size)
-              expect(subject).to match([
-                                         {
-                                           offset: 0,
-                                           processed_source: an_instance_of(RuboCop::ProcessedSource)
-                                                               .and(have_attributes(raw_source: expected))
-                                         }
-                                       ])
-            end
-          end
+        context "when HTML contains no ERB tags" do
+          let(:source) { "<html><body></body></html>" }
+          let(:expected) { "html; body; body1; html2; " }
 
+          it_behaves_like "extracts Ruby code"
+        end
+
+        context "when HTML contains ERB tags" do
           context "when it contains multiple ERB tags" do
             let(:source) { "<%= foo %>\n<%= bar %>" }
             let(:expected) { "_ = foo;  \n    bar;  " }
@@ -93,7 +92,7 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when it contains HTML tags" do
             let(:source) { "<p><%= x %></p>" }
-            let(:expected) { "       x;      " }
+            let(:expected) { "p; _ = x;  p1; " }
 
             it_behaves_like "extracts Ruby code"
           end
@@ -129,8 +128,7 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
             context "with unless block containing HTML" do
               let(:source) { "<% unless condition %><span>text</span><% end %>" }
-              # Placeholder position should be after %> (position 22), not after transformed code
-              let(:expected) { "   unless condition;  _ = nil;            end;  " }
+              let(:expected) { "   unless condition;  span;     span1;    end;  " }
 
               it_behaves_like "extracts Ruby code"
             end
@@ -170,16 +168,14 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
 
           context "when do block contains only HTML content" do
             let(:source) { "<% items.each do |item| %>\n  <p>HTML</p>\n<% end %>" }
-            # Placeholder _ = nil; inserted to prevent Lint/EmptyBlock
-            let(:expected) { "   items.each do |item|;  \n_ = nil;     \n   end;  " }
+            let(:expected) { "   items.each do |item|;  \n  p;     p1; \n   end;  " }
 
             it_behaves_like "extracts Ruby code"
           end
 
           context "when do block contains HTML and Ruby" do
             let(:source) { "<% items.each do |item| %>\n  <p><%= item %></p>\n<% end %>" }
-            # No placeholder needed when Ruby code exists in block
-            let(:expected) { "   items.each do |item|;  \n         item;      \n   end;  " }
+            let(:expected) { "   items.each do |item|;  \n  p; _ = item;  p1; \n   end;  " }
 
             it_behaves_like "extracts Ruby code"
           end

@@ -2,6 +2,7 @@
 
 require "herb"
 require_relative "block_stackable"
+require_relative "html_tag_transformer"
 require_relative "placeholder_builder"
 require_relative "ruby_comment_builder"
 require_relative "tag_openings"
@@ -47,11 +48,19 @@ module RuboCop
       include RubyCommentBuilder
 
       attr_reader :placeholder_builder #: PlaceholderBuilder
+      attr_reader :html_tag_transformer #: HtmlTagTransformer
+      attr_reader :source_bytes #: Array[Integer]
+      attr_reader :encoding #: Encoding
 
       # @rbs source_bytes: Array[Integer]
-      def initialize(source_bytes) #: void
+      # @rbs encoding: Encoding
+      # @rbs config: RuboCop::Config?
+      def initialize(source_bytes, encoding:, config:) #: void
         init_stack
+        @source_bytes = source_bytes
+        @encoding = encoding
         @placeholder_builder = PlaceholderBuilder.new(source_bytes)
+        @html_tag_transformer = HtmlTagTransformer.new(config)
         super()
       end
 
@@ -178,6 +187,14 @@ module RuboCop
         super
       end
 
+      # --- HTML element nodes ---
+      # @rbs node: ::Herb::AST::HTMLElementNode
+      def visit_html_element_node(node) #: void
+        visit_html_open_tag(node.open_tag) if node.open_tag
+        super
+        visit_html_close_tag(node.close_tag) if node.close_tag
+      end
+
       # --- Document node (root) ---
       # @rbs node: ::Herb::AST::DocumentNode
       def visit_document_node(node) #: void
@@ -190,6 +207,24 @@ module RuboCop
       def finalize! #: void
         adjust_last_output_prefix! # Adjust last output tag's prefix (EOF case)
         filter_comments! # Filter out comments with code on same line
+      end
+
+      # @rbs node: ::Herb::AST::HTMLOpenTagNode
+      def visit_html_open_tag(node) #: void
+        position = node.tag_opening.range.from
+        source = bytes_to_string(position, node.tag_closing.range.to)
+
+        result = html_tag_transformer.transform_open_tag(source, position:, location: node.location)
+        push_node(result) if result
+      end
+
+      # @rbs node: ::Herb::AST::HTMLCloseTagNode
+      def visit_html_close_tag(node) #: void
+        position = node.tag_opening.range.from
+        source = bytes_to_string(position, node.tag_closing.range.to)
+
+        result = html_tag_transformer.transform_close_tag(source, position:, location: node.location)
+        push_node(result) if result
       end
 
       # @rbs node: ::Herb::AST::erb_nodes
@@ -281,6 +316,13 @@ module RuboCop
         else
           "#{value};"
         end
+      end
+
+      # @rbs start_pos: Integer
+      # @rbs end_pos: Integer
+      def bytes_to_string(start_pos, end_pos) #: String
+        bytes = source_bytes[start_pos...end_pos] #: Array[Integer]
+        bytes.pack("C*").force_encoding(encoding)
       end
 
       def adjust_last_output_prefix! #: void

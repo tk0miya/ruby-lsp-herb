@@ -9,6 +9,12 @@ module RuboCop
       CR: Integer
 
       SPACE: Integer
+
+      SEMICOLON: Integer
+
+      DOUBLE_QUOTE: Integer
+
+      SINGLE_QUOTE: Integer
     end
   end
 end

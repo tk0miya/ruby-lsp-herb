@@ -51,7 +51,7 @@ module RuboCop
       def build_unified_ruby_source(parse_result) #: String?
         original_source = processed_source.raw_source
         source_bytes = original_source.bytes
-        visitor = ErbNodeVisitor.new(source_bytes)
+        visitor = ErbNodeVisitor.new(source_bytes, encoding: original_source.encoding, config: processed_source.config)
         parse_result.visit(visitor)
 
         return nil if visitor.results.empty?

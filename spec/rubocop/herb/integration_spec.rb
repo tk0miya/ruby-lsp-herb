@@ -143,16 +143,16 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       let(:source) do
         <<~ERB
           <% if user.admin? %>
-            <p><%= user.name %></p>
+            <p class="admin"><%= user.name %></p>
           <% elsif user.guest? %>
-            <p>Guest</p>
+            <p class="guest">Guest</p>
           <% else %>
-            <p><%= user.email %></p>
+            <p class="user"><%= user.email %></p>
           <% end %>
         ERB
       end
 
-      it "parses correctly and reports no offenses" do
+      it "reports no offenses" do
         runner.run(path, source, {})
         expect(runner.offenses).to be_empty
       end
@@ -163,16 +163,16 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
         <<~ERB
           <% case role %>
           <% when :admin %>
-            <p><%= admin_label %></p>
+            <p class="admin"><%= admin_label %></p>
           <% when :editor %>
-            <p>Editor</p>
+            <p class="editor">Editor</p>
           <% else %>
-            <p>Guest</p>
+            <p class="guest">Guest</p>
           <% end %>
         ERB
       end
 
-      it "parses correctly and reports no offenses" do
+      it "reports no offenses" do
         runner.run(path, source, {})
         expect(runner.offenses).to be_empty
       end
@@ -183,15 +183,15 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
         <<~ERB
           <% users.each do |user| %>
             <% if user.active? %>
-              <p><%= user.name %></p>
+              <p class="active"><%= user.name %></p>
             <% else %>
-              <p><%= user.email %></p>
+              <p class="inactive"><%= user.email %></p>
             <% end %>
           <% end %>
         ERB
       end
 
-      it "parses correctly and reports no offenses" do
+      it "reports no offenses" do
         runner.run(path, source, {})
         expect(runner.offenses).to be_empty
       end

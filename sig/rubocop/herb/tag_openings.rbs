@@ -8,6 +8,8 @@ module RuboCop
       # @rbs tag_opening: String
       def self.output?: (String tag_opening) -> bool
 
+      # ERB comment is only <%# ... %>
+      # <%- # comment -%> is Ruby code (not ERB comment)
       # @rbs tag_opening: String
       def self.comment?: (String tag_opening) -> bool
     end

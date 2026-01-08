@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require "herb"
+require "rubocop"
 require "ruby-lsp-herb"
 
 RSpec.describe RuboCop::Herb::ErbNodeVisitor do
   let(:parse_result) { Herb.parse(source) }
-  let(:visitor) { described_class.new(source.bytes) }
+  let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "double_quotes" }) }
+  let(:visitor) { described_class.new(source.bytes, encoding: source.encoding, config:) }
 
   describe "#results" do
     subject do
@@ -305,8 +307,13 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with HTML before ERB" do
         let(:source) { "<div><%= foo %></div>" }
 
-        it "tracks byte position after HTML" do
-          expect(subject.first).to have_attributes(position: 5)
+        it "tracks byte position of HTML and ERB" do
+          # First result is now the HTML open tag at position 0
+          expect(subject[0]).to have_attributes(position: 0, content: "div; ")
+          # Second result is the ERB tag at position 5
+          expect(subject[1]).to have_attributes(position: 5)
+          # Third result is the HTML close tag at position 15
+          expect(subject[2]).to have_attributes(position: 15, content: "div1; ")
         end
       end
 
