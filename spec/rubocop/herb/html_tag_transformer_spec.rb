@@ -29,35 +29,35 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
 
     context "with tag with attributes" do
       let(:source) { '<div id="x">' }
-      let(:expected) { 'div "d= x"; ' }
+      let(:expected) { "div 'd=\"x'; " }
 
       it_behaves_like "transforms HTML tag"
     end
 
     context "with tag with single-quoted attributes" do
       let(:source) { "<div id='x'>" }
-      let(:expected) { 'div "d= x"; ' }
+      let(:expected) { "div \"d='x\"; " }
 
       it_behaves_like "transforms HTML tag"
     end
 
     context "with tag with multiple attributes" do
       let(:source) { '<div id="x" class="y">' }
-      let(:expected) { 'div "d= x  class= y"; ' }
+      let(:expected) { "div 'd=\"x  class= y'; " }
 
       it_behaves_like "transforms HTML tag"
     end
 
     context "with tag with multibyte attribute name" do
       let(:source) { '<div 属性="x">' }
-      let(:expected) { 'div "  性= x"; ' }
+      let(:expected) { "div '  性=\"x'; " }
 
       it_behaves_like "transforms HTML tag"
     end
 
     context "with tag with multibyte attribute value" do
       let(:source) { '<div id="日">' }
-      let(:expected) { 'div "d= 日"; ' }
+      let(:expected) { "div 'd=\"日'; " }
 
       it_behaves_like "transforms HTML tag"
     end
@@ -138,14 +138,32 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
     end
   end
 
-  describe "preferred_quote" do
-    subject { transformer.transform_open_tag('<div id="x">', position: 0, location:).content }
+  describe "wrapper quote selection" do
+    context "with double-quoted attribute value" do
+      subject { transformer.transform_open_tag('<div id="x">', position: 0, location:).content }
+
+      it "uses single quotes as wrapper (opposite of preserved quote)" do
+        expect(subject).to eq("div 'd=\"x'; ")
+      end
+    end
+
+    context "with single-quoted attribute value" do
+      subject { transformer.transform_open_tag("<div id='x'>", position: 0, location:).content }
+
+      it "uses double quotes as wrapper (opposite of preserved quote)" do
+        expect(subject).to eq("div \"d='x\"; ")
+      end
+    end
+  end
+
+  describe "preferred_quote for boolean attributes" do
+    subject { transformer.transform_open_tag("<div disabled>", position: 0, location:).content }
 
     context "when config is nil" do
       let(:config) { nil }
 
       it "uses double quotes" do
-        expect(subject).to eq('div "d= x"; ')
+        expect(subject).to eq('div "isable"; ')
       end
     end
 
@@ -153,7 +171,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
       let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "double_quotes" }) }
 
       it "uses double quotes" do
-        expect(subject).to eq('div "d= x"; ')
+        expect(subject).to eq('div "isable"; ')
       end
     end
 
@@ -161,7 +179,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
       let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "single_quotes" }) }
 
       it "uses single quotes" do
-        expect(subject).to eq("div 'd= x'; ")
+        expect(subject).to eq("div 'isable'; ")
       end
     end
   end

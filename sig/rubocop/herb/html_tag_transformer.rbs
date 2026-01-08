@@ -6,11 +6,15 @@ module RuboCop
     #
     # Transformation rules:
     #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
-    #   Opening tag (attrs):    <div id="x"> → 'div "d= x"; ' (12 bytes)
+    #   Opening tag (attrs):    <div id="x"> → "div 'd=\"x'; " (12 bytes)
     #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
     #
+    # When attributes contain ="..." or ='...', the first quote after = is preserved
+    # and the wrapper quote is selected as the opposite (to avoid escaping).
+    # This makes it easier to identify the original HTML attribute format.
+    #
     # For multibyte characters, padding with spaces is used to preserve byte length:
-    #   <div 属性="x"> → 'div "  性= x"; ' (属 is 3 bytes → " + 2 spaces)
+    #   <div 属性="x"> → "div '  性=\"x'; " (属 is 3 bytes → ' + 2 spaces)
     class HtmlTagTransformer
       OPEN_TAG_PATTERN: ::Regexp
 
@@ -43,9 +47,23 @@ module RuboCop
       # @rbs attrs: String
       def transform_quoted_attrs: (String attrs) -> String
 
+      # Finds the first quote character after = in the attributes.
+      # @rbs attrs: String
+      def find_first_preserved_quote: (String attrs) -> String?
+
+      # Selects the wrapper quote character based on the preserved quote.
+      # @rbs preserved_quote: String?
+      def select_wrapper_quote: (String? preserved_quote) -> String
+
+      # Transforms attribute quotes while preserving the first one after =.
+      # @rbs attrs: String
+      # @rbs preserved_quote: String?
+      def transform_attr_quotes: (String attrs, String? preserved_quote) -> String
+
       # Converts a character to a quote with padding to preserve byte length.
       # @rbs char: String?
-      def convert_quote_char: (String? char) -> String
+      # @rbs quote: String
+      def convert_quote_char: (String? char, String quote) -> String
 
       def preferred_quote: () -> String
 
