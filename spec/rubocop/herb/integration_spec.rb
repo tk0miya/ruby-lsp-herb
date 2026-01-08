@@ -249,5 +249,25 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
         expect(cop_names).to eq([])
       end
     end
+
+    context "with identical HTML tags in if-else branches" do
+      let(:source) do
+        <<~ERB
+          <% if condition %>
+            <p>text1</p>
+          <% else %>
+            <p>text2</p>
+          <% end %>
+        ERB
+      end
+
+      it "reports Style/IdenticalConditionalBranches due to hash-based closing tags" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        # Both branches have identical "p;" (open tag) and "pD;" (close tag)
+        # Style/IdenticalConditionalBranches is triggered for each identical statement
+        expect(cop_names).to eq(%w[Style/IdenticalConditionalBranches] * 4)
+      end
+    end
   end
 end
