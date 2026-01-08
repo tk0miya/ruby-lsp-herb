@@ -62,9 +62,48 @@ Note: This project uses binstubs (`bin/`) instead of `bundle exec` for running c
 
 The project uses Steep with RBS inline annotations. Type signatures are in `sig/` directory. Run `bin/steep check` to verify types.
 
-When modifying files, regenerate RBS signatures by running:
+### Writing Type Annotations
+
+This project uses [rbs-inline](https://github.com/soutaro/rbs-inline) style annotations. Types are written as comments in Ruby source files:
+
+- **Argument types**: Use `@rbs argname: Type` comments before the method
+- **Return types**: Use `#: Type` comment at the end of the `def` line
+- **Attributes**: Use `#: Type` comment at the end of `attr_accessor`/`attr_reader` (also defines instance variable type)
+- **Instance variables**: Use `@rbs @name: Type` comment (must have blank line before method definition)
+
+```ruby
+# @rbs name: String
+# @rbs age: Integer
+def greet(name, age) #: String
+  "Hello, #{name}! You are #{age} years old."
+end
+
+attr_reader :name #: String
+
+# @rbs @count: Integer
+
+def initialize
+  @count = 0
+end
+```
+
+### Generating RBS Files
+
+Type definition files (`.rbs`) are generated from inline annotations using `rbs-inline`. **Never edit `.rbs` files directly** - always modify the inline annotations in Ruby source files and regenerate:
+
 ```bash
+# Generate RBS for a specific file
 bin/rbs-inline --opt-out --output=sig/ [filename]
+
+# Generate RBS for all files
+bin/rbs-inline --opt-out --output=sig/ lib/
+```
+
+After modifying type annotations, always regenerate the RBS files and run type checking:
+
+```bash
+bin/rbs-inline --opt-out --output=sig/ lib/
+bin/steep check
 ```
 
 ## Testing Guidelines
