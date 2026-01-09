@@ -36,7 +36,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
 
     context "with tag with single-quoted attributes" do
       let(:source) { "<div id='x'>" }
-      let(:expected) { "div \"d='x\"; " }
+      let(:expected) { "div 'd=\"x'; " }
 
       it_behaves_like "transforms HTML tag"
     end
@@ -138,20 +138,32 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
     end
   end
 
-  describe "wrapper quote selection" do
-    context "with double-quoted attribute value" do
-      subject { transformer.transform_open_tag('<div id="x">', position: 0, location:).content }
+  describe "quote selection based on RuboCop config" do
+    context "when config specifies double_quotes" do
+      let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "double_quotes" }) }
 
-      it "uses single quotes as wrapper (opposite of preserved quote)" do
-        expect(subject).to eq("div 'd=\"x'; ")
+      it "uses double quote for preserved attribute and single quote for wrapper" do
+        result = transformer.transform_open_tag('<div id="x">', position: 0, location:).content
+        expect(result).to eq("div 'd=\"x'; ")
+      end
+
+      it "converts HTML single quotes to RuboCop's preferred double quotes" do
+        result = transformer.transform_open_tag("<div id='x'>", position: 0, location:).content
+        expect(result).to eq("div 'd=\"x'; ")
       end
     end
 
-    context "with single-quoted attribute value" do
-      subject { transformer.transform_open_tag("<div id='x'>", position: 0, location:).content }
+    context "when config specifies single_quotes" do
+      let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "single_quotes" }) }
 
-      it "uses double quotes as wrapper (opposite of preserved quote)" do
-        expect(subject).to eq("div \"d='x\"; ")
+      it "uses single quote for preserved attribute and double quote for wrapper" do
+        result = transformer.transform_open_tag("<div id='x'>", position: 0, location:).content
+        expect(result).to eq("div \"d='x\"; ")
+      end
+
+      it "converts HTML double quotes to RuboCop's preferred single quotes" do
+        result = transformer.transform_open_tag('<div id="x">', position: 0, location:).content
+        expect(result).to eq("div \"d='x\"; ")
       end
     end
   end
