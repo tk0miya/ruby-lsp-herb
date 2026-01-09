@@ -158,6 +158,31 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
       end
     end
 
+    # When all branches start with the same HTML tag (without distinguishing attributes),
+    # RuboCop reports Style/IdenticalConditionalBranches because the extracted Ruby code
+    # appears to have identical expressions at the branch start.
+    # Note: Closing tags are not affected because they include a counter (e.g., p1, p2, p3)
+    # to make them unique.
+    context "with if-elsif-else block having identical HTML tags in all branches" do
+      let(:source) do
+        <<~ERB
+          <% if user.admin? %>
+            <p><%= user.name %></p>
+          <% elsif user.guest? %>
+            <p>Guest</p>
+          <% else %>
+            <p><%= user.email %></p>
+          <% end %>
+        ERB
+      end
+
+      it "reports Style/IdenticalConditionalBranches" do
+        runner.run(path, source, {})
+        cop_names = runner.offenses.map(&:cop_name)
+        expect(cop_names).to eq(%w[Style/IdenticalConditionalBranches] * 3)
+      end
+    end
+
     context "with case-when-else block" do
       let(:source) do
         <<~ERB
