@@ -33,6 +33,17 @@ bin/rspec spec/rubocop/herb/ruby_extractor_spec.rb:42
 
 Note: This project uses binstubs (`bin/`) instead of `bundle exec` for running commands.
 
+## Claude Code on the Web Setup
+
+When using Claude Code on the web (claude.ai/code), the environment may have a different bundler version than the one specified in `Gemfile.lock`. Before starting development, run the following commands to install the correct bundler version and dependencies:
+
+```bash
+gem install bundler -v 2.5.23
+bundle _2.5.23_ install
+```
+
+This ensures compatibility with the lockfile and prevents bundler version mismatch errors.
+
 ## Architecture
 
 ### Two Main Integration Points
