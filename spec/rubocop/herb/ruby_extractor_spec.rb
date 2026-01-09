@@ -180,6 +180,20 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
             it_behaves_like "extracts Ruby code"
           end
 
+          context "when it contains if-elsif-else" do
+            let(:source) { "<% if x %>\n  a\n<% elsif y %>\n  b\n<% else %>\n  c\n<% end %>" }
+            let(:expected) { "   if x;  \n   \n   elsif y;  \n   \n   else;  \n   \n   end;  " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
+          context "when it contains case-when-else" do
+            let(:source) { "<% case x %>\n<% when 1 %>\n  a\n<% when 2 %>\n  b\n<% else %>\n  c\n<% end %>" }
+            let(:expected) { "   case x;  \n   when 1;  \n   \n   when 2;  \n   \n   else;  \n   \n   end;  " }
+
+            it_behaves_like "extracts Ruby code"
+          end
+
           context "when it contains multibyte characters" do
             let(:source) { "<%= \"日本語\" %>" }
             let(:expected) { "    \"日本語\";  " }

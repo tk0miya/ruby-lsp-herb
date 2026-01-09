@@ -143,7 +143,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects if, else, and end nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   if x;", "   else;", "   end;")
+          expect(codes).to eq(["   if x;", "   else;", "   end;"])
         end
       end
 
@@ -152,7 +152,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all branch nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   if x;", "   elsif y;", "   else;", "   end;")
+          expect(codes).to eq(["   if x;", "   elsif y;", "   else;", "   end;"])
         end
       end
     end
@@ -175,7 +175,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects case and when nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   case x;", "   when 1;", "   when 2;", "   end;")
+          expect(codes).to eq(["   case x;", "   when 1;", "   when 2;", "   end;"])
         end
       end
     end
@@ -219,7 +219,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects begin, rescue, and end nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   begin;", "   rescue;", "   end;")
+          expect(codes).to eq(["   begin;", "   rescue;", "_ = nil;", "   end;"])
         end
       end
 
@@ -228,7 +228,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all exception handling nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   begin;", "   rescue;", "   ensure;", "   end;")
+          expect(codes).to eq(["   begin;", "   rescue;", "_ = nil;", "   ensure;", "_ = nil;", "   end;"])
         end
       end
 
@@ -237,7 +237,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "preserves rescue arguments" do
           codes = subject.map(&:code)
-          expect(codes).to include("   rescue StandardError => e;")
+          expect(codes).to eq(["   begin;", "   rescue StandardError => e;", "_ = nil;", "   end;"])
         end
       end
     end
@@ -277,8 +277,10 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all nested nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   items.each do |item|;", "   if item.active?;", "    item.name;")
-          expect(codes.count { |c| c == "   end;" }).to eq(2)
+          expect(codes).to eq([
+                                "   items.each do |item|;", "   if item.active?;",
+                                "    item.name;", "   end;", "   end;"
+                              ])
         end
       end
 
@@ -290,7 +292,10 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all nested nodes" do
           codes = subject.map(&:code)
-          expect(codes).to include("   items.each do |item|;", "   case item.type;", "   when :a;", "   when :b;")
+          expect(codes).to eq([
+                                "   items.each do |item|;", "   case item.type;",
+                                "   when :a;", "   when :b;", "   end;", "   end;"
+                              ])
         end
       end
     end
