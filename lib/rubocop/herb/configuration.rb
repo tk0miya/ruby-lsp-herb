@@ -25,6 +25,7 @@ module RuboCop
         "Lint/EmptyWhen",                 # Case/when bodies may contain only HTML (no Ruby code)
         "Style/EmptyElse",                # Else branches may contain only HTML (no Ruby code)
         "Style/FrozenStringLiteralComment", # ERB files don't have frozen string literal comments
+        "Style/IdenticalConditionalBranches", # HTML tags appear in all branches (e.g., <p> in if/elsif/else)
         "Style/IfUnlessModifier",         # Conditional HTML wrapping is extracted as single line
         "Style/IfWithSemicolon",          # Semicolons are inserted between ERB tags on the same line
         "Style/Next",                     # `next unless` style is less readable than if/end in ERB templates

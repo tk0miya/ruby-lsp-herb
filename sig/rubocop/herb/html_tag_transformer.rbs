@@ -5,16 +5,15 @@ module RuboCop
     # Class for transforming HTML tags to Ruby code while preserving byte length.
     #
     # Transformation rules:
-    #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
-    #   Opening tag (attrs):    <div id="x"> → "div 'd=\"x'; " (12 bytes, with double_quotes config)
-    #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
+    #   Opening tag (no attrs): <div>        → " div;"        (6 bytes)
+    #   Opening tag (attrs):    <div id="x"> → ' div id=""; ' (12 bytes)
+    #   Closing tag:            </div>       → " div1;"       (7 bytes, counter rotates 1-9,0)
     #
-    # When attributes contain ="..." or ='...', the first quote after = is preserved
-    # using RuboCop's preferred quote style. The wrapper quote is the opposite to
-    # avoid escaping. This makes it easier to identify the original HTML attribute format.
+    # Attribute format is preserved: id="value" becomes id="", making it easier
+    # to identify original HTML attributes in RuboCop error messages.
+    # The quote character used is based on RuboCop's Style/StringLiterals config.
     #
-    # For multibyte characters, padding with spaces is used to preserve byte length:
-    #   <div 属性="x"> → "div '  性=\"x'; " (属 is 3 bytes → ' + 2 spaces)
+    # For multibyte characters, padding with spaces is used to preserve byte length.
     class HtmlTagTransformer
       OPEN_TAG_PATTERN: ::Regexp
 
@@ -41,25 +40,27 @@ module RuboCop
 
       def next_close_tag_count: () -> Integer
 
+      # Transforms attributes, preserving format like id="".
+      # The result includes ; at the end (replacing the last char).
       # @rbs attrs: String
       def transform_attrs: (String attrs) -> String
 
+      # Transforms quoted attributes: id="value" → id="";
+      # - Attribute name and = are preserved (unless name is a Ruby keyword)
+      # - Value is removed, quotes become empty ("")
+      # - Semicolon and padding spaces are added to maintain byte count
+      # - Ruby keywords (class, for, etc.) are replaced with spaces
+      # - Semicolon is placed to avoid Layout/SpaceBeforeSemicolon violations
+      # Example: id="x" → id=""; (6 bytes both)
+      # Example: class="admin" → ;(12 spaces) (13 bytes both)
+      # Example: id="x" class="admin" → id="";(14 spaces) (20 bytes both)
       # @rbs attrs: String
       def transform_quoted_attrs: (String attrs) -> String
 
-      # Returns the opposite quote character.
-      # @rbs quote: String
-      def opposite_quote: (String quote) -> String
+      RUBY_KEYWORDS: Set[String]
 
-      # Transforms attribute quotes, preserving the first one after = with the given quote.
-      # @rbs attrs: String
-      # @rbs inner_quote: String
-      def transform_attr_quotes: (String attrs, String inner_quote) -> String
-
-      # Converts a character to a quote with padding to preserve byte length.
-      # @rbs char: String?
-      # @rbs quote: String
-      def convert_quote_char: (String? char, String quote) -> String
+      # @rbs name: String
+      def ruby_keyword?: (String name) -> bool
 
       def preferred_quote: () -> String
 
