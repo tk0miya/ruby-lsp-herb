@@ -5,9 +5,10 @@ require "rubocop/herb/erb_node_visitor"
 
 source = ARGV[0] || $stdin.read
 source_bytes = source.bytes
+encoding = source.encoding
 
 parse_result = Herb.parse(source)
-visitor = RuboCop::Herb::ErbNodeVisitor.new(source_bytes)
+visitor = RuboCop::Herb::ErbNodeVisitor.new(source_bytes, encoding:, config: nil)
 parse_result.visit(visitor)
 
 result_bytes = source_bytes.map { |b| [10, 13].include?(b) ? b : 32 }
