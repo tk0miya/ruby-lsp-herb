@@ -1,0 +1,63 @@
+# Generated from lib/rubocop/herb/text_transformer.rb with RBS::Inline
+
+module RuboCop
+  module Herb
+    # Class for transforming HTML text content to Ruby code while preserving byte length.
+    #
+    # Transformation rules:
+    #   Text content: "string"     → '"tr"; '      (6 bytes)
+    #   Multibyte:    "日本語hello" → '"  本語he"; ' (14 bytes, padding preserves byte length)
+    #
+    # The first character is replaced with a quote (+ padding for multibyte).
+    # The last 3 characters are replaced with '"; ' (+ padding for multibyte).
+    # Text with 4 or fewer characters is not transformed.
+    class TextTransformer
+      @source_bytes: Array[Integer]
+
+      @encoding: Encoding
+
+      LF: Integer
+
+      attr_reader config: RuboCop::Config?
+
+      attr_reader source_bytes: Array[Integer]
+
+      attr_reader encoding: Encoding
+
+      # @rbs source_bytes: Array[Integer]
+      # @rbs encoding: Encoding
+      # @rbs config: RuboCop::Config?
+      def initialize: (Array[Integer] source_bytes, encoding: Encoding, config: RuboCop::Config?) -> void
+
+      # @rbs text: String
+      # @rbs location: ::Herb::Location
+      def transform: (String text, location: ::Herb::Location) -> Result?
+
+      private
+
+      # @rbs text: String
+      def transform_content: (String text) -> String
+
+      # Converts the first character to a quote with padding to preserve byte length.
+      # @rbs char: String
+      def convert_to_opening_quote: (String char) -> String
+
+      # Converts the last 3 characters to '"; ' with padding to preserve byte length.
+      # @rbs chars: String
+      def convert_to_closing: (String chars) -> String
+
+      def preferred_quote: () -> String
+
+      # @rbs location: ::Herb::Location
+      def calculate_byte_position: (::Herb::Location location) -> Integer
+
+      # @rbs line_start: Integer
+      def extract_line_bytes: (Integer line_start) -> Array[Integer]
+
+      # @rbs content: String
+      # @rbs position: Integer
+      # @rbs location: ::Herb::Location
+      def build_result: (String content, Integer position, ::Herb::Location location) -> Result
+    end
+  end
+end

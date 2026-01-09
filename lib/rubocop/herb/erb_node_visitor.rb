@@ -4,6 +4,7 @@ require "herb"
 require_relative "block_stackable"
 require_relative "html_tag_transformer"
 require_relative "placeholder_builder"
+require_relative "text_transformer"
 require_relative "ruby_comment_builder"
 require_relative "tag_openings"
 
@@ -49,6 +50,7 @@ module RuboCop
 
       attr_reader :placeholder_builder #: PlaceholderBuilder
       attr_reader :html_tag_transformer #: HtmlTagTransformer
+      attr_reader :text_transformer #: TextTransformer
       attr_reader :source_bytes #: Array[Integer]
       attr_reader :encoding #: Encoding
 
@@ -61,6 +63,7 @@ module RuboCop
         @encoding = encoding
         @placeholder_builder = PlaceholderBuilder.new(source_bytes)
         @html_tag_transformer = HtmlTagTransformer.new(config)
+        @text_transformer = TextTransformer.new(source_bytes, encoding:, config:)
         super()
       end
 
@@ -201,6 +204,13 @@ module RuboCop
       def visit_document_node(node) #: void
         super
         finalize!
+      end
+
+      # --- HTML text nodes ---
+      # @rbs node: ::Herb::AST::HTMLTextNode
+      def visit_html_text_node(node) #: void
+        result = text_transformer.transform(node.content, location: node.location)
+        push_node(result) if result
       end
 
       private

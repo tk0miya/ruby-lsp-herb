@@ -35,6 +35,8 @@ module RuboCop
 
       private
 
+      def preferred_quote: () -> String
+
       def next_close_tag_count: () -> Integer
 
       # @rbs attrs: String
@@ -46,8 +48,6 @@ module RuboCop
       # Converts a character to a quote with padding to preserve byte length.
       # @rbs char: String?
       def convert_quote_char: (String? char) -> String
-
-      def preferred_quote: () -> String
 
       # @rbs content: String
       # @rbs position: Integer

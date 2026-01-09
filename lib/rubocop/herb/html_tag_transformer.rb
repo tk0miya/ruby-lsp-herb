@@ -50,6 +50,13 @@ module RuboCop
 
       private
 
+      def preferred_quote #: String
+        return '"' unless config
+
+        style = config.for_cop("Style/StringLiterals")["EnforcedStyle"]
+        style == "single_quotes" ? "'" : '"'
+      end
+
       def next_close_tag_count #: Integer
         @close_tag_counter = (@close_tag_counter + 1) % 10
       end
@@ -76,13 +83,6 @@ module RuboCop
 
         padding = " " * [char.bytesize - 1, 0].max
         preferred_quote + padding
-      end
-
-      def preferred_quote #: String
-        return '"' unless config
-
-        style = config.for_cop("Style/StringLiterals")["EnforcedStyle"]
-        style == "single_quotes" ? "'" : '"'
       end
 
       # @rbs content: String

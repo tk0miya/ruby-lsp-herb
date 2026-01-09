@@ -50,6 +50,8 @@ module RuboCop
 
       attr_reader html_tag_transformer: HtmlTagTransformer
 
+      attr_reader text_transformer: TextTransformer
+
       attr_reader source_bytes: Array[Integer]
 
       attr_reader encoding: Encoding
@@ -117,9 +119,19 @@ module RuboCop
       # @rbs node: ::Herb::AST::DocumentNode
       def visit_document_node: (::Herb::AST::DocumentNode node) -> void
 
+      # --- HTML text nodes ---
+      # @rbs node: ::Herb::AST::HTMLTextNode
+      def visit_html_text_node: (::Herb::AST::HTMLTextNode node) -> void
+
       private
 
       def finalize!: () -> void
+
+      # @rbs node: ::Herb::AST::HTMLOpenTagNode
+      def visit_html_open_tag: (::Herb::AST::HTMLOpenTagNode node) -> void
+
+      # @rbs node: ::Herb::AST::HTMLCloseTagNode
+      def visit_html_close_tag: (::Herb::AST::HTMLCloseTagNode node) -> void
 
       # @rbs node: ::Herb::AST::erb_nodes
       def output_tag?: (::Herb::AST::erb_nodes node) -> bool
@@ -147,12 +159,6 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def build_ruby_code: (::Herb::AST::erb_nodes node) -> String
-
-      # @rbs node: ::Herb::AST::HTMLOpenTagNode
-      def visit_html_open_tag: (::Herb::AST::HTMLOpenTagNode node) -> void
-
-      # @rbs node: ::Herb::AST::HTMLCloseTagNode
-      def visit_html_close_tag: (::Herb::AST::HTMLCloseTagNode node) -> void
 
       # @rbs start_pos: Integer
       # @rbs end_pos: Integer

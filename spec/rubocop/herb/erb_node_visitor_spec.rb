@@ -109,9 +109,21 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with empty do block" do
         let(:source) { "<% items.each do |item| %>\n    HTML\n<% end %>" }
 
-        it "includes placeholder Result for empty blocks" do
-          placeholder = subject.find { |r| r.code == "_ = nil;" }
-          expect(placeholder).to have_attributes(code: "_ = nil;")
+        it "includes text Result for blocks with HTML content" do
+          # Text "    HTML\n" (9 chars) is transformed to Ruby string literal
+          text_result = subject.find { |r| r.content.start_with?('"') && r.content.end_with?("\"; ") }
+          expect(text_result).not_to be_nil
+        end
+      end
+
+      context "with empty do block (text too short for both transform and placeholder)" do
+        let(:source) { "<% items.each do |item| %>\nXYZ\n<% end %>" }
+
+        it "only includes block opening and closing" do
+          # Text "\nXYZ\n" (5 chars) is transformed to Ruby string literal
+          # But the space between tags is too small for placeholder
+          codes = subject.map(&:code)
+          expect(codes).to include("   items.each do |item|;", "   end;")
         end
       end
 
@@ -130,7 +142,32 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with simple if" do
         let(:source) { "<% if condition %>\n  content\n<% end %>" }
 
-        it "collects if and end nodes with placeholder" do
+        it "collects if, text, and end nodes" do
+          # Text "  content\n" (10 chars) is transformed to Ruby string literal
+          expect(subject.size).to eq(3)
+          expect(subject[0]).to have_attributes(code: "   if condition;")
+          expect(subject[1].content).to start_with('"').and end_with('"; ')
+          expect(subject[2]).to have_attributes(code: "   end;")
+        end
+      end
+
+      context "with simple if (short content, no space for placeholder)" do
+        let(:source) { "<% if condition %>\nXY\n<% end %>" }
+
+        it "collects only if and end nodes when text is too short" do
+          # Text "\nXY\n" (4 chars) is too short to transform (length <= 4)
+          # Space is also too small for placeholder (needs 8 bytes)
+          expect(subject.size).to eq(2)
+          expect(subject[0]).to have_attributes(code: "   if condition;")
+          expect(subject[1]).to have_attributes(code: "   end;")
+        end
+      end
+
+      context "with simple if (whitespace-only text is not transformed)" do
+        let(:source) { "<% if condition %>\n        \n<% end %>" }
+
+        it "does not transform whitespace-only text, adds placeholder instead" do
+          # Whitespace-only text is skipped, so placeholder is added
           expect(subject.size).to eq(3)
           expect(subject[0]).to have_attributes(code: "   if condition;")
           expect(subject[1]).to have_attributes(code: "_ = nil;")
@@ -143,7 +180,8 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects if, else, and end nodes" do
           codes = subject.map(&:code)
-          expect(codes).to eq(["   if x;", "   else;", "   end;"])
+          # "  a\n" and "  b\n" are 4 chars, transformed to '" "; '
+          expect(codes).to eq(["   if x;", "\" \"; ", "   else;", "\" \"; ", "   end;"])
         end
       end
 
@@ -152,7 +190,8 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all branch nodes" do
           codes = subject.map(&:code)
-          expect(codes).to eq(["   if x;", "   elsif y;", "   else;", "   end;"])
+          # "  a\n", "  b\n", "  c\n" are 4 chars, transformed to '" "; '
+          expect(codes).to eq(["   if x;", "\" \"; ", "   elsif y;", "\" \"; ", "   else;", "\" \"; ", "   end;"])
         end
       end
     end
@@ -175,7 +214,8 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects case and when nodes" do
           codes = subject.map(&:code)
-          expect(codes).to eq(["   case x;", "   when 1;", "   when 2;", "   end;"])
+          # "\n  a\n" and "\n  b\n" are 5 chars, transformed to '" "; '
+          expect(codes).to eq(["   case x;", "   when 1;", "\" \"; ", "   when 2;", "\" \"; ", "   end;"])
         end
       end
     end
@@ -219,7 +259,8 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects begin, rescue, and end nodes" do
           codes = subject.map(&:code)
-          expect(codes).to eq(["   begin;", "   rescue;", "_ = nil;", "   end;"])
+          # "\n  risky\n" (8 chars) → '"  ris"; ', "\n  handle\n" (10 chars) → '"  hand"; '
+          expect(codes).to eq(["   begin;", "\"  ris\"; ", "   rescue;", "\"  hand\"; ", "   end;"])
         end
       end
 
@@ -228,7 +269,11 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all exception handling nodes" do
           codes = subject.map(&:code)
-          expect(codes).to eq(["   begin;", "   rescue;", "_ = nil;", "   ensure;", "_ = nil;", "   end;"])
+          # "\n  risky\n" → '"  ris"; ', "\n  handle\n" → '"  hand"; ', "\n  cleanup\n" → '"  clean"; '
+          expect(codes).to eq([
+                                "   begin;", "\"  ris\"; ", "   rescue;", "\"  hand\"; ",
+                                "   ensure;", "\"  clean\"; ", "   end;"
+                              ])
         end
       end
 
@@ -237,7 +282,8 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "preserves rescue arguments" do
           codes = subject.map(&:code)
-          expect(codes).to eq(["   begin;", "   rescue StandardError => e;", "_ = nil;", "   end;"])
+          # "\n  risky\n" → '"  ris"; ', "\n  handle\n" → '"  hand"; '
+          expect(codes).to eq(["   begin;", "\"  ris\"; ", "   rescue StandardError => e;", "\"  hand\"; ", "   end;"])
         end
       end
     end
@@ -292,10 +338,70 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "collects all nested nodes" do
           codes = subject.map(&:code)
+          # Text content "\n    a\n  " and "\n    b\n  " are transformed
           expect(codes).to eq([
                                 "   items.each do |item|;", "   case item.type;",
-                                "   when :a;", "   when :b;", "   end;", "   end;"
+                                "   when :a;", "\"    a\"; ", "   when :b;", "\"    b\"; ", "   end;", "   end;"
                               ])
+        end
+      end
+    end
+
+    describe "HTML text nodes" do
+      context "with text longer than 4 characters" do
+        let(:source) { "<div>string</div>" }
+
+        it "transforms text to Ruby string literal" do
+          text_result = subject.find { |r| r.content == "\"tr\"; " }
+          expect(text_result).not_to be_nil
+        end
+      end
+
+      context "with text exactly 5 characters" do
+        let(:source) { "<div>hello</div>" }
+
+        it "transforms text to Ruby string literal" do
+          text_result = subject.find { |r| r.content == "\"e\"; " }
+          expect(text_result).not_to be_nil
+        end
+      end
+
+      context "with text exactly 4 characters" do
+        let(:source) { "<div>text</div>" }
+
+        it "does not transform text" do
+          text_result = subject.find { |r| r.prefix == "" && r.content.start_with?('"') }
+          expect(text_result).to be_nil
+        end
+      end
+
+      context "with text shorter than 4 characters" do
+        let(:source) { "<div>abc</div>" }
+
+        it "does not transform text" do
+          text_result = subject.find { |r| r.prefix == "" && r.content.start_with?('"') }
+          expect(text_result).to be_nil
+        end
+      end
+
+      context "with plain text only" do
+        let(:source) { "string" }
+
+        it "transforms text to Ruby string literal" do
+          expect(subject.size).to eq(1)
+          expect(subject.first).to have_attributes(position: 0, content: "\"tr\"; ")
+        end
+      end
+
+      context "with text containing multibyte characters" do
+        let(:source) { "日本語hello" }
+
+        it "transforms text with byte-preserving padding" do
+          # "日" is 3 bytes → '"  ' (quote + 2 spaces = 3 bytes)
+          # "llo" is 3 bytes → '"; ' (3 bytes, no padding needed)
+          expect(subject.size).to eq(1)
+          expect(subject.first.content).to eq('"  本語he"; ')
+          expect(subject.first.content.bytesize).to eq(source.bytesize)
         end
       end
     end

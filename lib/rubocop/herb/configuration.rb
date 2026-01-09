@@ -23,12 +23,14 @@ module RuboCop
         "Layout/TrailingWhitespace",      # Extracted Ruby code from ERB may have trailing whitespace
         "Lint/EmptyConditionalBody",      # Control flow bodies may contain only HTML (no Ruby code)
         "Lint/EmptyWhen",                 # Case/when bodies may contain only HTML (no Ruby code)
+        "Lint/Void",                      # HTML text is converted to string literals which appear unused
         "Style/EmptyElse",                # Else branches may contain only HTML (no Ruby code)
         "Style/FrozenStringLiteralComment", # ERB files don't have frozen string literal comments
         "Style/IfUnlessModifier",         # Conditional HTML wrapping is extracted as single line
         "Style/IfWithSemicolon",          # Semicolons are inserted between ERB tags on the same line
         "Style/Next",                     # `next unless` style is less readable than if/end in ERB templates
-        "Style/Semicolon"                 # Semicolons are inserted between ERB tags on the same line
+        "Style/Semicolon",                # Semicolons are inserted between ERB tags on the same line
+        "Style/StringLiterals"            # HTML text is converted to string literals with specific quote style
       ].freeze #: Array[String]
 
       class << self
