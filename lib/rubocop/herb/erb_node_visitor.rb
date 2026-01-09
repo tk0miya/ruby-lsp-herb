@@ -144,6 +144,7 @@ module RuboCop
       # @rbs node: ::Herb::AST::ERBEndNode
       def visit_erb_end_node(node) #: void
         close_block(node)
+        push_erb_tag(node)
         super
       end
 
@@ -295,12 +296,10 @@ module RuboCop
         block = pop_block
         current_block.concat(block)
 
-        if block.size == 1 && block.first && !case_node?(block.first)
-          placeholder = placeholder_builder.build(block.first, end_node)
-          push_node(placeholder) if placeholder
-        end
+        return unless block.size == 1 && block.first && !case_node?(block.first)
 
-        push_erb_tag(end_node)
+        placeholder = placeholder_builder.build(block.first, end_node)
+        push_node(placeholder) if placeholder
       end
 
       # @rbs result: Result
