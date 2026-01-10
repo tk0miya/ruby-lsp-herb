@@ -9,50 +9,68 @@ module RubyLsp
     class ErbAnalyzer
       attr_reader :uri #: URI::Generic?
       attr_reader :source #: String
+      attr_reader :herb_parse_result #: ::Herb::ParseResult?
+      attr_reader :herb_warnings #: Array[::Herb::Warnings::Warning]
+      attr_reader :rubocop_offenses #: Array[RuboCop::Cop::Offense]
 
       # @rbs uri: URI::Generic?
       # @rbs source: String
       def initialize(uri, source) #: void
         @uri = uri
         @source = source
+        @herb_parse_result = nil
+        @herb_warnings = []
+        @rubocop_offenses = []
       end
 
-      def to_prism_parse_result #: Prism::ParseResult # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
-        herb_parse_result = ::Herb.parse(source)
-        prism_source = build_prism_source(herb_parse_result.source)
-
-        # Herb parser errors
-        errors = herb_parse_result.errors.map do |error|
-          loc = convert_herb_location(prism_source, error.location)
-          Prism::ParseError.new(:error, error.message, loc, :error)
-        end
-
-        # Herb parser warnings
-        warnings = herb_parse_result.warnings.map do |warning|
-          loc = convert_herb_location(prism_source, warning.location)
-          Prism::ParseWarning.new(:warning, warning.message, loc, :warning)
-        end
-
-        if errors.any?
-          value = herb_parse_result.value #: untyped
-          return Prism::ParseResult.new(value, [], [], nil, errors, warnings, prism_source)
-        end
+      def analyze #: void # rubocop:disable Metrics/AbcSize
+        @herb_parse_result = ::Herb.parse(source)
+        return unless herb_parse_result
+        return if herb_parse_result.errors.any?
 
         # Herb Lint: ERB tag formatting rules
         visitor = MyVisitor.new
         herb_parse_result.visit(visitor)
-        visitor.herb_warnings.each do |warning|
-          loc = convert_herb_location(prism_source, warning.location)
-          warnings << Prism::ParseWarning.new(:warning, warning.message, loc, :warning)
+        herb_warnings.concat(visitor.herb_warnings)
+
+        # RuboCop Lint: Ruby code style and lint rules
+        return unless uri
+
+        result = RuboCopRunner.instance.run(uri, source)
+        rubocop_offenses.concat(result.offenses)
+      end
+
+      def to_prism_parse_result #: Prism::ParseResult # rubocop:disable Metrics/AbcSize
+        raise "Must call analyze before to_prism_parse_result" unless herb_parse_result
+
+        prism_source = build_prism_source(herb_parse_result.source)
+
+        # Herb parser errors
+        errors = herb_parse_result.errors.map do |error|
+          location = convert_herb_location(prism_source, error.location)
+          Prism::ParseError.new(:error, error.message, location, :error)
         end
 
-        # RuboCop Lint: Ruby code style and lint rules (preserving severity)
-        if uri
-          result = RuboCopRunner.instance.run(uri, source)
-          result.offenses.each do |offense|
-            level = rubocop_severity_to_prism_level(offense.severity.name)
-            location = convert_offense_location(prism_source, offense)
-            message = "[#{offense.cop_name}] #{offense.message}"
+        # Herb parser warnings
+        warnings = herb_parse_result.warnings.map do |warning|
+          location = convert_herb_location(prism_source, warning.location)
+          Prism::ParseWarning.new(:warning, warning.message, location, :warning)
+        end
+
+        # Herb Lint warnings
+        herb_warnings.each do |warning|
+          location = convert_herb_location(prism_source, warning.location)
+          warnings << Prism::ParseWarning.new(:warning, warning.message, location, :warning)
+        end
+
+        # RuboCop offenses (preserving severity)
+        rubocop_offenses.each do |offense|
+          level = rubocop_severity_to_prism_level(offense.severity.name)
+          location = convert_offense_location(prism_source, offense)
+          message = "[#{offense.cop_name}] #{offense.message}"
+          if %i[error fatal].include?(offense.severity.name)
+            errors << Prism::ParseError.new(level, message, location, level)
+          else
             warnings << Prism::ParseWarning.new(level, message, location, level)
           end
         end
