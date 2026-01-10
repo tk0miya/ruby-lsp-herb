@@ -97,11 +97,15 @@ module RubyLsp
 
       def build_config_store #: untyped
         config_file = Tempfile.new([".rubocop", ".yml"], Dir.pwd)
-        config_file.write(YAML.dump(::RuboCop::Herb::Configuration.to_rubocop_config))
-        config_file.close
+        begin
+          config_file.write(YAML.dump(::RuboCop::Herb::Configuration.to_rubocop_config))
+          config_file.close
 
-        ::RuboCop::ConfigStore.new.tap do |store|
-          store.options_config = config_file.path
+          ::RuboCop::ConfigStore.new.tap do |store|
+            store.options_config = config_file.path
+          end
+        ensure
+          config_file.unlink
         end
       end
     end
