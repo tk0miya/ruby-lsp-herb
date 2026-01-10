@@ -18,37 +18,28 @@ module RubyLsp
         raise "File not found: #{filename}" unless File.exist?(filename)
 
         content = File.read(filename)
-        result = ::Herb.parse(content)
+        analyzer = ErbAnalyzer.new(nil, content)
+        result = analyzer.analyze
+
         if result.errors.present?
           puts "Parse error:"
           result.errors.each do |error|
             puts "- #{error.message} at #{filename}:#{error.location.start.line}:#{error.location.start.column}"
           end
-        else
-          lint_html_erb(result)
-          if result.warnings.present?
-            puts "Warnings:"
-            result.warnings.each do |warning|
-              puts "- #{warning.message} at #{filename}:#{warning.location.start.line}:#{warning.location.start.column}"
-            end
+        elsif result.warnings.present?
+          puts "Warnings:"
+          result.warnings.each do |warning|
+            puts "- #{warning.message} at #{filename}:#{warning.location.start.line}:#{warning.location.start.column}"
           end
-        end
-      end
-
-      def lint_html_erb(result) #: void
-        visitor = MyVisitor.new
-        result.visit(visitor)
-        visitor.offences.each do |message, location|
-          result.warnings << ::Herb::Warnings::Warning.new("warning", location, message)
         end
       end
     end
 
     class MyVisitor < ::Herb::Visitor
-      attr_reader :offences #: Array[[String, ::Herb::Location]]
+      attr_reader :herb_warnings #: Array[::Herb::Warnings::Warning]
 
       def initialize #: void
-        @offences = []
+        @herb_warnings = []
         super
       end
 
@@ -59,12 +50,20 @@ module RubyLsp
 
       def visit_erb_nodes(node) #: void
         unless node.content.value.start_with?(" ", "\n")
-          offences << ["ERB tag should start with a space or newline", node.tag_opening.location]
+          warn("ERB tag should start with a space or newline", node.tag_opening.location)
         end
 
         unless node.content.value.end_with?(" ", "\n") # rubocop:disable Style/GuardClause
-          offences << ["ERB tag should end with a space or newline", node.tag_closing.location]
+          warn("ERB tag should end with a space or newline", node.tag_closing.location)
         end
+      end
+
+      private
+
+      # @rbs message: String
+      # @rbs location: ::Herb::Location
+      def warn(message, location) #: void
+        herb_warnings << ::Herb::Warnings::Warning.new("warning", location, message)
       end
     end
   end

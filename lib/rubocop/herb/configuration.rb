@@ -43,7 +43,8 @@ module RuboCop
         end
 
         def to_rubocop_config #: Hash[String, untyped]
-          globs = @supported_extensions.map { |ext| "**/*#{ext}" }
+          # Include both relative and absolute path patterns for glob matching
+          globs = @supported_extensions.flat_map { |ext| ["**/*#{ext}", "/**/*#{ext}"] }
 
           config = { "AllCops" => { "Include" => globs } }
           EXCLUDED_COPS.each do |cop|

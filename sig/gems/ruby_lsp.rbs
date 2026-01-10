@@ -1,3 +1,9 @@
+module URI
+  class Generic
+    def to_standardized_path: () -> String?
+  end
+end
+
 module RubyLsp
   module Interface = LanguageServer::Protocol::Interface
   module Constant = LanguageServer::Protocol::Constant

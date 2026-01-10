@@ -105,10 +105,6 @@ gems:
     revision: 57196ee070a59a2dfd64f9f91a3f974a9a5afea8
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
-- name: io-console
-  version: '0'
-  source:
-    type: stdlib
 - name: json
   version: '0'
   source:
@@ -165,14 +161,6 @@ gems:
     revision: 57196ee070a59a2dfd64f9f91a3f974a9a5afea8
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
-- name: pp
-  version: '0'
-  source:
-    type: stdlib
-- name: prettyprint
-  version: '0'
-  source:
-    type: stdlib
 - name: prism
   version: 1.7.0
   source:
@@ -257,6 +245,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: tempfile
+  version: '0'
+  source:
+    type: stdlib
 - name: time
   version: '0'
   source:
@@ -278,6 +270,10 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: uri
+  version: '0'
+  source:
+    type: stdlib
+- name: yaml
   version: '0'
   source:
     type: stdlib

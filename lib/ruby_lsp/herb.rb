@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "herb/addon"
+require_relative "herb/rubocop_runner"
+require_relative "herb/erb_analyzer"
 require_relative "herb/herb_document"
 require_relative "herb/linter"
 require_relative "herb/logger"

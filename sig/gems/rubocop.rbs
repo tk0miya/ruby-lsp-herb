@@ -5,6 +5,46 @@ module RuboCop
     def call: (ProcessedSource) -> rubyExtractorResult
   end
 
+  class Config
+    # Extend gem_rbs_collection's definition to allow optional arguments
+    def initialize: () -> void
+                  | ...
+  end
+
+  module Plugin
+    def self.integrate_plugins: (Config config, Array[String] plugins) -> void
+  end
+
+  class ConfigStore
+    def options_config=: (String? path) -> void
+  end
+
+  module Cop
+    class Severity
+      attr_reader name: Symbol
+      def level: () -> Integer
+    end
+
+    class Offense
+      attr_reader cop_name: String
+      attr_reader message: String
+      attr_reader severity: Severity
+      attr_reader line: Integer
+      attr_reader column: Integer
+      attr_reader location: Parser::Source::Range
+    end
+  end
+
+  module Lsp
+    class StdinRunner
+      def self.ruby_extractors: () -> Array[_RubyExtractor]
+
+      def initialize: (ConfigStore config_store) -> void
+      def run: (String path, String source, Hash[untyped, untyped] options) -> void
+      def offenses: () -> Array[Cop::Offense]
+    end
+  end
+
   module AST
     class ProcessedSource
       attr_reader ruby_version: Float

@@ -15,3 +15,5 @@ path: .gem_rbs_collection
 
 gems:
   - name: delegate
+  - name: tempfile
+  - name: yaml

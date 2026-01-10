@@ -1,0 +1,30 @@
+# Generated from lib/ruby_lsp/herb/erb_analyzer.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    # Analyzer class for ERB templates.
+    # Parses ERB source and runs both Herb Lint and RuboCop Lint.
+    class ErbAnalyzer
+      attr_reader uri: URI::Generic?
+
+      attr_reader source: String
+
+      # @rbs uri: URI::Generic?
+      # @rbs source: String
+      def initialize: (URI::Generic? uri, String source) -> void
+
+      def analyze: () -> ::Herb::ParseResult
+
+      def to_prism_parse_result: () -> Prism::ParseResult
+
+      private
+
+      # @rbs source: String
+      def build_prism_source: (String source) -> Prism::Source
+
+      # @rbs prism_source: Prism::Source
+      # @rbs location: ::Herb::Location
+      def convert_location: (Prism::Source prism_source, ::Herb::Location location) -> Prism::Location
+    end
+  end
+end

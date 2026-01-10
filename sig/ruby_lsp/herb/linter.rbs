@@ -9,18 +9,22 @@ module RubyLsp
       def initialize: (Array[String] args) -> void
 
       def run: () -> void
-
-      def lint_html_erb: (untyped result) -> void
     end
 
     class MyVisitor < ::Herb::Visitor
-      attr_reader offences: Array[[ String, ::Herb::Location ]]
+      attr_reader herb_warnings: Array[::Herb::Warnings::Warning]
 
       def initialize: () -> void
 
       def visit_child_nodes: (untyped node) -> void
 
       def visit_erb_nodes: (untyped node) -> void
+
+      private
+
+      # @rbs message: String
+      # @rbs location: ::Herb::Location
+      def warn: (String message, ::Herb::Location location) -> void
     end
   end
 end

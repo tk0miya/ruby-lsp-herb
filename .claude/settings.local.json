@@ -40,7 +40,15 @@
       "Bash(echo:*)",
       "Bash(ruby bin/extract_ruby.rb:*)",
       "Bash(git checkout:*)",
-      "Bash(printf:*)"
+      "Bash(printf:*)",
+      "Bash(gem contents:*)",
+      "Bash(bin/bundle:*)",
+      "Bash(gem which:*)",
+      "Bash(ruby -c:*)",
+      "Bash(ruby:*)",
+      "Bash(git stash:*)",
+      "Bash(git stash pop:*)",
+      "Bash(bin/rbs collection install:*)"
     ]
   },
   "hooks": {

@@ -65,12 +65,12 @@ RSpec.describe RuboCop::Herb::Configuration do
 
     context "with default extensions" do
       it "returns AllCops Include with default glob" do
-        expect(subject["AllCops"]["Include"]).to eq(["**/*.html.erb"])
+        expect(subject["AllCops"]["Include"]).to eq(["**/*.html.erb", "/**/*.html.erb"])
       end
 
       it "returns Exclude patterns for excluded cops" do
-        expect(subject["Layout/BlockAlignment"]["Exclude"]).to eq(["**/*.html.erb"])
-        expect(subject["Style/FrozenStringLiteralComment"]["Exclude"]).to eq(["**/*.html.erb"])
+        expect(subject["Layout/BlockAlignment"]["Exclude"]).to eq(["**/*.html.erb", "/**/*.html.erb"])
+        expect(subject["Style/FrozenStringLiteralComment"]["Exclude"]).to eq(["**/*.html.erb", "/**/*.html.erb"])
       end
     end
 
@@ -80,12 +80,13 @@ RSpec.describe RuboCop::Herb::Configuration do
       end
 
       it "returns AllCops Include with custom globs" do
-        expect(subject["AllCops"]["Include"]).to eq(["**/*.html.erb", "**/*.erb"])
+        expect(subject["AllCops"]["Include"]).to eq(["**/*.html.erb", "/**/*.html.erb", "**/*.erb", "/**/*.erb"])
       end
 
       it "returns Exclude patterns for excluded cops" do
-        expect(subject["Layout/BlockAlignment"]["Exclude"]).to eq(["**/*.html.erb", "**/*.erb"])
-        expect(subject["Style/FrozenStringLiteralComment"]["Exclude"]).to eq(["**/*.html.erb", "**/*.erb"])
+        expected = ["**/*.html.erb", "/**/*.html.erb", "**/*.erb", "/**/*.erb"]
+        expect(subject["Layout/BlockAlignment"]["Exclude"]).to eq(expected)
+        expect(subject["Style/FrozenStringLiteralComment"]["Exclude"]).to eq(expected)
       end
     end
   end

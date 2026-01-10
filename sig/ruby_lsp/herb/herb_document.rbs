@@ -4,17 +4,11 @@ module RubyLsp
   module Herb
     # @rbs generic T
     class HerbDocument[T] < RubyLsp::ERBDocument[T]
-      attr_reader parse_result: ::Herb::ParseResult
+      attr_reader parse_result: ::Prism::ParseResult
 
       def parse!: () -> void
 
-      def parse_html_erb: (untyped source) -> void
-
-      def convert_parse_result: (untyped herb_parse_result) -> Prism::ParseResult
-
-      def convert_source: (untyped source) -> Prism::Source
-
-      def convert_location: (untyped source, untyped location) -> Prism::Location
+      def ast: () -> Prism::ProgramNode
 
       def syntax_error?: () -> bool
     end

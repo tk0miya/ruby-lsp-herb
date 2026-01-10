@@ -3,6 +3,7 @@ module RubyLsp
     @needs_parsing: bool
 
     attr_reader source: String
+    attr_reader uri: URI::Generic
 
     def initialize: (source: String, version: Integer, uri: URI::Generic, global_state: GlobalState) -> void
   end

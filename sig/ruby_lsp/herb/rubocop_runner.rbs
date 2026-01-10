@@ -1,0 +1,47 @@
+# Generated from lib/ruby_lsp/herb/rubocop_runner.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    # Runner class for executing RuboCop on ERB templates using StdinRunner.
+    # Uses RuboCop::Herb::RubyExtractor to extract Ruby code from ERB.
+    class RuboCopRunner
+      # Result object that holds RuboCop offenses and provides Herb-compatible errors/warnings.
+      class Result
+        attr_reader offenses: Array[RuboCop::Cop::Offense]
+
+        # @rbs offenses: Array[RuboCop::Cop::Offense]
+        def initialize: (Array[RuboCop::Cop::Offense] offenses) -> void
+
+        def herb_errors: () -> Array[::Herb::Errors::Error]
+
+        def herb_warnings: () -> Array[::Herb::Warnings::Warning]
+
+        private
+
+        # Convert RuboCop offense location to Herb::Location
+        # @rbs offense: RuboCop::Cop::Offense
+        def convert_offense_to_herb_location: (RuboCop::Cop::Offense offense) -> ::Herb::Location
+      end
+
+      self.@instance: RuboCopRunner
+
+      def self.instance: () -> RuboCopRunner
+
+      attr_reader config_store: RuboCop::ConfigStore
+
+      attr_reader runner: RuboCop::Lsp::StdinRunner
+
+      def initialize: () -> void
+
+      # @rbs uri: URI::Generic
+      # @rbs source: String
+      def run: (URI::Generic uri, String source) -> Result
+
+      private
+
+      def setup_extractor: () -> void
+
+      def build_config_store: () -> untyped
+    end
+  end
+end
