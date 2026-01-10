@@ -12,7 +12,11 @@ module RubyLsp
     # auto-correct, and reconstructs the ERB file with the formatted Ruby code.
     class Formatter
       # Replacement data structure for tracking content changes
-      Replacement = Data.define(:start_pos, :end_pos, :new_content)
+      Replacement = Data.define(
+        :start_pos,   #: Integer - byte position of content start
+        :end_pos,     #: Integer - byte position of content end
+        :new_content  #: String - formatted Ruby code
+      )
 
       # @rbs @source: String
       # @rbs @path: String

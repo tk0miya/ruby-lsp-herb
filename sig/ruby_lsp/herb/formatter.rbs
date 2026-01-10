@@ -8,14 +8,14 @@ module RubyLsp
     class Formatter
       # Replacement data structure for tracking content changes
       class Replacement < Data
-        attr_reader start_pos(): untyped
+        attr_reader start_pos(): Integer
 
-        attr_reader end_pos(): untyped
+        attr_reader end_pos(): Integer
 
-        attr_reader new_content(): untyped
+        attr_reader new_content(): String
 
-        def self.new: (untyped start_pos, untyped end_pos, untyped new_content) -> instance
-                    | (start_pos: untyped, end_pos: untyped, new_content: untyped) -> instance
+        def self.new: (Integer start_pos, Integer end_pos, String new_content) -> instance
+                    | (start_pos: Integer, end_pos: Integer, new_content: String) -> instance
 
         def self.members: () -> [ :start_pos, :end_pos, :new_content ]
 
