@@ -28,7 +28,7 @@ module RubyLsp
 
       @encoding: Encoding
 
-      @rubocop_runner: untyped
+      @rubocop_runner: RuboCopRunner
 
       # @rbs source: String
       # @rbs path: String
@@ -55,10 +55,6 @@ module RubyLsp
       # @rbs result: RuboCop::Herb::Result
       # @rbs content: String
       def build_ruby_source: (RuboCop::Herb::Result result, String content) -> String?
-
-      # Run RuboCop auto-correct on Ruby source
-      # @rbs ruby_source: String
-      def run_rubocop: (String ruby_source) -> String?
 
       # Extract the formatted content from RuboCop output
       # @rbs formatted: String

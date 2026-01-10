@@ -17,6 +17,7 @@ module RuboCop
 
   class ConfigStore
     def options_config=: (String? path) -> void
+    def for_pwd: () -> Config
   end
 
   module Cop
@@ -42,6 +43,7 @@ module RuboCop
       def initialize: (ConfigStore config_store) -> void
       def run: (String path, String source, Hash[untyped, untyped] options) -> void
       def offenses: () -> Array[Cop::Offense]
+      def formatted_source: () -> String
     end
   end
 

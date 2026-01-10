@@ -29,15 +29,4 @@ module RubyLsp
 
     def set: (uri: URI::Generic, source: String, version: Integer, language_id: Symbol) -> Document[untyped]
   end
-
-  module Requests
-    module Support
-      class RuboCopRunner
-        def initialize: (*String args) -> void
-        def run: (String path, String contents, untyped prism_result) -> void
-        def formatted_source: () -> String
-        attr_reader config_for_working_directory: untyped
-      end
-    end
-  end
 end

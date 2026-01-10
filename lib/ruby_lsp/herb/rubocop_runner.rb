@@ -86,6 +86,22 @@ module RubyLsp
         Result.new(runner.offenses)
       end
 
+      # Run RuboCop with auto-correct and return formatted source
+      # @rbs path: String
+      # @rbs source: String
+      def run_formatting(path, source) #: String?
+        options = { autocorrect: true } #: Hash[untyped, untyped]
+        runner.run(path, source, options)
+        runner.formatted_source
+      rescue StandardError
+        nil
+      end
+
+      # Get RuboCop config for working directory
+      def config_for_working_directory #: untyped
+        config_store.for_pwd
+      end
+
       private
 
       def setup_extractor #: void

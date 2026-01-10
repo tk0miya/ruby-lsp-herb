@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 require "herb"
-require "prism"
-require "ruby_lsp/requests/support/rubocop_runner"
 require "rubocop/herb/erb_node_visitor"
+require_relative "rubocop_runner"
 
 module RubyLsp
   module Herb
@@ -21,7 +20,7 @@ module RubyLsp
       # @rbs @source: String
       # @rbs @path: String
       # @rbs @encoding: Encoding
-      # @rbs @rubocop_runner: untyped
+      # @rbs @rubocop_runner: RuboCopRunner
 
       # @rbs source: String
       # @rbs path: String
@@ -29,7 +28,7 @@ module RubyLsp
         @source = source
         @path = path
         @encoding = source.encoding
-        @rubocop_runner = RubyLsp::Requests::Support::RuboCopRunner.new("-a")
+        @rubocop_runner = RuboCopRunner.instance
       end
 
       def run #: String?
@@ -102,7 +101,8 @@ module RubyLsp
         ruby_source = build_ruby_source(result, stripped_content)
         return nil unless ruby_source
 
-        formatted = run_rubocop(ruby_source)
+        # Use .rb extension to ensure RuboCop treats it as Ruby code
+        formatted = @rubocop_runner.run_formatting("#{@path}.rb", ruby_source)
         return nil unless formatted
 
         formatted_stripped = extract_formatted_content(formatted, result)
@@ -124,22 +124,13 @@ module RubyLsp
         end
       end
 
-      # Run RuboCop auto-correct on Ruby source
-      # @rbs ruby_source: String
-      def run_rubocop(ruby_source) #: String?
-        # Create a dummy parse result for RuboCop
-        parse_result = Prism.parse_lex(ruby_source)
-
-        @rubocop_runner.run(@path, ruby_source, parse_result)
-        @rubocop_runner.formatted_source
-      rescue StandardError
-        nil
-      end
-
       # Extract the formatted content from RuboCop output
       # @rbs formatted: String
       # @rbs result: RuboCop::Herb::Result
       def extract_formatted_content(formatted, result) #: String?
+        # Remove frozen_string_literal comment that RuboCop may add
+        formatted = formatted.sub(/\A# frozen_string_literal: true\n+/, "")
+
         if result.output?
           # Remove the "_ = " prefix we added
           formatted = formatted.sub(/\A_ = /, "")

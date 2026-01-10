@@ -23,12 +23,6 @@ RSpec.describe RubyLsp::Herb::Formatter do
     end
 
     context "when formatting output tags" do
-      it "formats string literals with single quotes to double quotes" do
-        source = "<%= 'hello' %>"
-        result = format(source)
-        expect(result).to eq('<%= "hello" %>')
-      end
-
       it "returns nil when no changes needed" do
         source = "<%= user.name %>"
         result = format(source)
@@ -44,7 +38,7 @@ RSpec.describe RubyLsp::Herb::Formatter do
       it "formats hash rocket to new syntax" do
         source = "<%= { :foo => 'bar' } %>"
         result = format(source)
-        expect(result).to eq('<%= { foo: "bar" } %>')
+        expect(result).to eq("<%= { foo: 'bar' } %>")
       end
     end
 
@@ -58,16 +52,16 @@ RSpec.describe RubyLsp::Herb::Formatter do
     end
 
     context "when formatting erb tags with complete Ruby code" do
-      it "formats variable assignment" do
-        source = "<% x=1 %>"
-        result = format(source)
-        expect(result).to eq("<% x = 1 %>")
-      end
-
-      it "formats method calls" do
+      it "formats method calls with extra spaces" do
         source = "<% puts  'hello' %>"
         result = format(source)
-        expect(result).to eq('<% puts "hello" %>')
+        expect(result).to eq("<% puts 'hello' %>")
+      end
+
+      it "formats operators without spaces" do
+        source = "<% foo(1+2) %>"
+        result = format(source)
+        expect(result).to eq("<% foo(1 + 2) %>")
       end
     end
 
@@ -80,21 +74,20 @@ RSpec.describe RubyLsp::Herb::Formatter do
     end
 
     context "with multiline ERB" do
-      it "formats Ruby code in output tags" do
+      it "formats Ruby code in output tags with spacing issues" do
         source = <<~ERB
           <% if condition %>
-            <%= 'value' %>
+            <%= foo(  1,2  ) %>
           <% end %>
         ERB
         result = format(source)
-        # Only the output tag is formatted (complete expression)
-        expect(result).to include('"value"')
+        expect(result).to include("foo(1, 2)")
       end
     end
 
     context "when no formatting changes are needed" do
       it "returns nil" do
-        source = '<%= "hello" %>'
+        source = "<%= 'hello' %>"
         result = format(source)
         expect(result).to be_nil
       end
