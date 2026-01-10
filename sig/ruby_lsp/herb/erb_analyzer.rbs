@@ -9,9 +9,17 @@ module RubyLsp
 
       attr_reader source: String
 
+      attr_reader herb_parse_result: ::Herb::ParseResult?
+
+      attr_reader herb_warnings: Array[::Herb::Warnings::Warning]
+
+      attr_reader rubocop_offenses: Array[RuboCop::Cop::Offense]
+
       # @rbs uri: URI::Generic?
       # @rbs source: String
       def initialize: (URI::Generic? uri, String source) -> void
+
+      def analyze: () -> void
 
       def to_prism_parse_result: () -> Prism::ParseResult
 
