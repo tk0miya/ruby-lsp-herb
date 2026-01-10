@@ -29,21 +29,21 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
 
     context "with tag with attributes" do
       let(:source) { '<div id="x">' }
-      let(:expected) { 'div "d= x"; ' }
+      let(:expected) { ' div id=""; ' }
 
       it_behaves_like "transforms HTML tag"
     end
 
     context "with tag with single-quoted attributes" do
       let(:source) { "<div id='x'>" }
-      let(:expected) { 'div "d= x"; ' }
+      let(:expected) { ' div id=""; ' }
 
       it_behaves_like "transforms HTML tag"
     end
 
     context "with tag with multiple attributes" do
       let(:source) { '<div id="x" class="y">' }
-      let(:expected) { 'div "d= x  class= y"; ' }
+      let(:expected) { ' div id="x  class= "; ' }
 
       it_behaves_like "transforms HTML tag"
     end
@@ -57,7 +57,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
 
     context "with tag with multibyte attribute value" do
       let(:source) { '<div id="日">' }
-      let(:expected) { 'div "d= 日"; ' }
+      let(:expected) { ' div id=""  ; ' }
 
       it_behaves_like "transforms HTML tag"
     end
@@ -86,6 +86,62 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
     context "with tag with single character attribute" do
       let(:source) { "<div x>" }
       let(:expected) { "div  ; " }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with single character attribute name and value" do
+      let(:source) { '<div a="b">' }
+      let(:expected) { ' div a=""; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with Ruby keyword as attribute name" do
+      let(:source) { '<div class="foo">' }
+      let(:expected) { 'div "lass= foo"; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with for attribute (Ruby keyword)" do
+      let(:source) { '<label for="input">' }
+      let(:expected) { 'label "or= input"; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with attribute name containing hyphen" do
+      let(:source) { '<div data-url="https://example.com?a=1">' }
+      let(:expected) { 'div "ata-url= https://example.com?a=1"; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with empty attribute value" do
+      let(:source) { '<div id="">' }
+      let(:expected) { ' div id="; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with longer attribute values" do
+      let(:source) { '<div id="foo" value="bar">' }
+      let(:expected) { ' div id="foo  value= ba"; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with valued attribute followed by boolean attribute" do
+      let(:source) { '<div id="x" disabled>' }
+      let(:expected) { ' div id="x  disabl"; ' }
+
+      it_behaves_like "transforms HTML tag"
+    end
+
+    context "with boolean attribute followed by valued attribute" do
+      let(:source) { '<input disabled id="x">' }
+      let(:expected) { 'input "isabled id= x"; ' }
 
       it_behaves_like "transforms HTML tag"
     end
@@ -145,7 +201,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
       let(:config) { nil }
 
       it "uses double quotes" do
-        expect(subject).to eq('div "d= x"; ')
+        expect(subject).to eq(' div id=""; ')
       end
     end
 
@@ -153,7 +209,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
       let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "double_quotes" }) }
 
       it "uses double quotes" do
-        expect(subject).to eq('div "d= x"; ')
+        expect(subject).to eq(' div id=""; ')
       end
     end
 
@@ -161,7 +217,7 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
       let(:config) { instance_double(RuboCop::Config, for_cop: { "EnforcedStyle" => "single_quotes" }) }
 
       it "uses single quotes" do
-        expect(subject).to eq("div 'd= x'; ")
+        expect(subject).to eq(" div id=''; ")
       end
     end
   end

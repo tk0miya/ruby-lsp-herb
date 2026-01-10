@@ -5,16 +5,26 @@ module RuboCop
     # Class for transforming HTML tags to Ruby code while preserving byte length.
     #
     # Transformation rules:
-    #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
-    #   Opening tag (attrs):    <div id="x"> → 'div "d= x"; ' (12 bytes)
-    #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
+    #   Opening tag (no attrs):    <div>                        → "div; "
+    #   Opening tag (single attr): <div id="foo">               → ' div id="fo"; '
+    #   Opening tag (multi attrs): <div id="foo" value="bar">   → ' div id="foo  value= ba"; '
+    #   Closing tag:               </div>                       → "div0; " (counter rotates 0-9)
     #
-    # For multibyte characters, padding with spaces is used to preserve byte length:
-    #   <div 属性="x"> → 'div "  性= x"; ' (属 is 3 bytes → " + 2 spaces)
+    # For attributes with values, the first attribute name is preserved to make
+    # RuboCop lint messages more readable and help users identify the original HTML.
+    # All subsequent attributes are represented as part of the first attribute's value.
+    # The last character is trimmed to make room for the closing quote and semicolon.
+    #
+    # For multibyte characters, padding with spaces is used to preserve byte length.
     class HtmlTagTransformer
       OPEN_TAG_PATTERN: ::Regexp
 
       CLOSE_TAG_PATTERN: ::Regexp
+
+      VALUED_ATTR_PATTERN: ::Regexp
+
+      # Ruby keywords that cannot be used as method names/identifiers
+      RUBY_KEYWORDS: untyped
 
       attr_reader config: RuboCop::Config?
 
@@ -35,13 +45,36 @@ module RuboCop
 
       private
 
+      # @rbs tag_name: String
+      # @rbs space: String
+      # @rbs attrs_str: String
+      def build_open_tag_content: (String tag_name, String space, String attrs_str) -> String
+
+      # @rbs tag_name: String
+      # @rbs space: String
+      # @rbs attrs_str: String
+      # @rbs attr_prefix: String
+      # @rbs value_part: String
+      def build_valued_attrs_content: (String tag_name, String space, String attrs_str, String attr_prefix, String value_part) -> String
+
       def next_close_tag_count: () -> Integer
 
-      # @rbs attrs: String
-      def transform_attrs: (String attrs) -> String
+      # Transform attributes when the first attribute has a value (e.g., foo="bar").
+      # Preserves the attribute name and converts all subsequent content into the value.
+      # Trims the last character to make room for the trailing "; " after attrs.
+      # @rbs attr_prefix: String
+      # @rbs value_part: String
+      def transform_valued_attrs: (String attr_prefix, String value_part) -> String
 
+      # Transform attributes when the first attribute is boolean (no value).
+      # Uses the original format without trimming (no leading space in result).
       # @rbs attrs: String
-      def transform_quoted_attrs: (String attrs) -> String
+      def transform_boolean_attrs: (String attrs) -> String
+
+      # Transform attributes when the first attribute name is a Ruby keyword.
+      # Uses the original format (replacing first char with quote) to avoid syntax errors.
+      # @rbs attrs: String
+      def transform_keyword_attrs: (String attrs) -> String
 
       # Converts a character to a quote with padding to preserve byte length.
       # @rbs char: String?
