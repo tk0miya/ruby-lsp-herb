@@ -1,0 +1,73 @@
+# Generated from lib/ruby_lsp/herb/formatter.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    # Formatter for ERB files that formats Ruby code within ERB tags using RuboCop.
+    # This class extracts Ruby code from ERB tags, formats each snippet with RuboCop's
+    # auto-correct, and reconstructs the ERB file with the formatted Ruby code.
+    class Formatter
+      # Replacement data structure for tracking content changes
+      class Replacement < Data
+        attr_reader start_pos(): untyped
+
+        attr_reader end_pos(): untyped
+
+        attr_reader new_content(): untyped
+
+        def self.new: (untyped start_pos, untyped end_pos, untyped new_content) -> instance
+                    | (start_pos: untyped, end_pos: untyped, new_content: untyped) -> instance
+
+        def self.members: () -> [ :start_pos, :end_pos, :new_content ]
+
+        def members: () -> [ :start_pos, :end_pos, :new_content ]
+      end
+
+      @source: String
+
+      @path: String
+
+      @encoding: Encoding
+
+      @rubocop_runner: untyped
+
+      # @rbs source: String
+      # @rbs path: String
+      def initialize: (String source, path: String) -> void
+
+      def run: () -> String?
+
+      private
+
+      # Format ERB source by replacing Ruby code in each ERB tag with formatted version
+      # @rbs results: Array[RuboCop::Herb::Result]
+      def format_erb: (Array[RuboCop::Herb::Result] results) -> String?
+
+      # Build a replacement for a single ERB tag
+      # @rbs result: RuboCop::Herb::Result
+      def build_replacement: (RuboCop::Herb::Result result) -> Replacement?
+
+      # Format Ruby code content using RuboCop
+      # @rbs result: RuboCop::Herb::Result
+      # @rbs original_content: String
+      def format_ruby_content: (RuboCop::Herb::Result result, String original_content) -> String?
+
+      # Build Ruby source code that RuboCop can process
+      # @rbs result: RuboCop::Herb::Result
+      # @rbs content: String
+      def build_ruby_source: (RuboCop::Herb::Result result, String content) -> String?
+
+      # Run RuboCop auto-correct on Ruby source
+      # @rbs ruby_source: String
+      def run_rubocop: (String ruby_source) -> String?
+
+      # Extract the formatted content from RuboCop output
+      # @rbs formatted: String
+      # @rbs result: RuboCop::Herb::Result
+      def extract_formatted_content: (String formatted, RuboCop::Herb::Result result) -> String?
+
+      # Apply all replacements to the source string
+      # @rbs replacements: Array[Replacement]
+      def apply_replacements: (Array[Replacement] replacements) -> String?
+    end
+  end
+end

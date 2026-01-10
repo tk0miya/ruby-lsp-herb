@@ -1,0 +1,17 @@
+# Generated from lib/ruby_lsp/herb/formatting.rb with RBS::Inline
+
+module RubyLsp
+  module Herb
+    # LSP formatting request handler for ERB files.
+    # Returns TextEdit array to replace the document content with formatted version.
+    class Formatting < RubyLsp::Requests::Request
+      @document: untyped
+
+      @path: String
+
+      def initialize: (untyped document, path: String) -> void
+
+      def perform: () -> Array[untyped]?
+    end
+  end
+end
