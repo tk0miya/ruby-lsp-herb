@@ -4,6 +4,18 @@ module LanguageServer
       class FullDocumentDiagnosticReport
         def initialize: (kind: untyped, items: untyped) -> void
       end
+
+      class TextEdit
+        def initialize: (range: Range, new_text: String) -> void
+      end
+
+      class Range
+        def initialize: (start: Position, end: Position) -> void
+      end
+
+      class Position
+        def initialize: (line: Integer, character: Integer) -> void
+      end
     end
 
     module Constant

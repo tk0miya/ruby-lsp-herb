@@ -3,8 +3,12 @@
 module RubyLsp
   class Server < BaseServer
     alias original_text_document_diagnostic text_document_diagnostic
+    alias original_text_document_formatting text_document_formatting
 
     # @rbs override
-    def text_document_diagnostic: ...
+    def text_document_formatting: (Hash[untyped, untyped]) -> void
+
+    # @rbs override
+    def text_document_diagnostic: (Hash[untyped, untyped]) -> void
   end
 end
