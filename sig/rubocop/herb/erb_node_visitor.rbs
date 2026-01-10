@@ -158,6 +158,10 @@ module RuboCop
       # @rbs end_pos: Integer
       def bytes_to_string: (Integer start_pos, Integer end_pos) -> String
 
+      # Checks if the HTML open tag has any ERB tags in its attribute values.
+      # @rbs node: ::Herb::AST::HTMLOpenTagNode
+      def erb_in_attributes?: (::Herb::AST::HTMLOpenTagNode node) -> bool
+
       def adjust_last_output_prefix!: () -> void
 
       def filter_comments!: () -> void

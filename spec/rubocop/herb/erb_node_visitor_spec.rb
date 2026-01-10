@@ -330,5 +330,62 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
         end
       end
     end
+
+    describe "ERB inside HTML attributes" do
+      context "with ERB in attribute value" do
+        let(:source) { '<div class="<%= active_class %>">content</div>' }
+
+        it "skips HTML open tag transformation and extracts only ERB content" do
+          # Should have 2 results: ERB content and close tag
+          expect(subject.size).to eq(2)
+          # Output tag at EOF gets prefix adjusted to spaces
+          expect(subject[0]).to have_attributes(position: 12, code: "_ = active_class;")
+          expect(subject[1]).to have_attributes(position: 40, content: "div1; ")
+        end
+      end
+
+      context "with ERB and surrounding text in attribute" do
+        let(:source) { '<div class="prefix-<%= klass %>-suffix">content</div>' }
+
+        it "extracts only ERB content" do
+          expect(subject.size).to eq(2)
+          expect(subject[0]).to have_attributes(position: 19, code: "_ = klass;")
+          expect(subject[1]).to have_attributes(content: "div1; ")
+        end
+      end
+
+      context "with multiple ERB tags in same attribute" do
+        let(:source) { '<div class="<%= foo %> <%= bar %>">content</div>' }
+
+        it "extracts all ERB contents" do
+          expect(subject.size).to eq(3)
+          expect(subject[0]).to have_attributes(position: 12, code: "_ = foo;")
+          expect(subject[1]).to have_attributes(position: 23, code: "_ = bar;")
+          expect(subject[2]).to have_attributes(content: "div1; ")
+        end
+      end
+
+      context "with ERB in multiple attributes" do
+        let(:source) { '<div class="<%= foo %>" id="<%= bar %>">content</div>' }
+
+        it "extracts all ERB contents from different attributes" do
+          expect(subject.size).to eq(3)
+          expect(subject[0]).to have_attributes(position: 12, code: "_ = foo;")
+          expect(subject[1]).to have_attributes(position: 28, code: "_ = bar;")
+          expect(subject[2]).to have_attributes(content: "div1; ")
+        end
+      end
+
+      context "with static attributes (no ERB)" do
+        let(:source) { '<div class="active"><%= user.name %></div>' }
+
+        it "still transforms HTML tags normally" do
+          expect(subject.size).to eq(3)
+          expect(subject[0]).to have_attributes(position: 0, content: 'div "lass= active"; ')
+          expect(subject[1]).to have_attributes(position: 20, code: "_ = user.name;")
+          expect(subject[2]).to have_attributes(content: "div1; ")
+        end
+      end
+    end
   end
 end
