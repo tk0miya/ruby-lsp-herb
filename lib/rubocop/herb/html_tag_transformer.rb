@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
+require "set"
+
 module RuboCop
   module Herb
     # Class for transforming HTML tags to Ruby code while preserving byte length.
     #
     # Transformation rules:
-    #   Opening tag (no attrs): <div>        → " div;"        (6 bytes)
-    #   Opening tag (attrs):    <div id="x"> → ' div id=""; ' (12 bytes)
-    #   Closing tag:            </div>       → " div1;"       (7 bytes, counter rotates 1-9,0)
+    #   Opening tag (no attrs): <div>                  → " div;"                  (6 bytes)
+    #   Opening tag (1 attr):   <div id="x">           → ' div id="x" '           (12 bytes)
+    #   Opening tag (2+ attrs): <div id="x" data="y">  → ' div id="x" data="y" '  (22 bytes)
+    #   Closing tag:            </div>                 → " div1;"                 (7 bytes)
     #
-    # Attribute format is preserved: id="value" becomes id="", making it easier
-    # to identify original HTML attributes in RuboCop error messages.
-    # The quote character used is based on RuboCop's Style/StringLiterals config.
-    #
-    # For multibyte characters, padding with spaces is used to preserve byte length.
+    # Quotes are normalized to RuboCop's preferred style (Style/StringLiterals).
+    # Ruby keywords (class, for, etc.) are replaced with spaces to avoid syntax errors.
     class HtmlTagTransformer
       OPEN_TAG_PATTERN = /\A<([a-zA-Z0-9]+)(\s*)(.*)>\z/m
       CLOSE_TAG_PATTERN = %r{\A</([a-zA-Z0-9]+)>\z}
@@ -41,16 +41,8 @@ module RuboCop
                     # <div> → " div;" (< becomes space, > becomes ;)
                     " #{tag_name}#{space};"
                   else
-                    transformed_attrs = transform_attrs(attrs.to_s)
-                    if transformed_attrs.start_with?(";")
-                      # All keyword attrs: put semicolon right after tag name to avoid SpaceBeforeSemicolon
-                      # <i class="x"> → " i;            " (semicolon after tag name, rest are spaces)
-                      " #{tag_name};#{space}#{transformed_attrs[1..]} "
-                    else
-                      # Has non-keyword attrs: keep semicolon in attrs
-                      # <div id="x"> → " div id=""; " (semicolon after empty quotes)
-                      " #{tag_name}#{space}#{transformed_attrs} "
-                    end
+                    # <div id="x"> → " div id= x  " (attrs with quotes replaced by spaces)
+                    " #{tag_name}#{space}#{transform_attrs(attrs.to_s)} "
                   end
         build_result(content, position, location)
       end
@@ -65,6 +57,16 @@ module RuboCop
 
         build_result(content, position, location)
       end
+
+      # Ruby reserved keywords that would cause syntax errors if used as identifiers
+      RUBY_KEYWORDS = Set.new(
+        %w[
+          class for if unless while until case when begin end
+          def do module rescue ensure raise return yield break next
+          and or not in alias defined? super self nil true false
+          __FILE__ __LINE__ __ENCODING__
+        ]
+      ).freeze #: Set[String]
 
       private
 
@@ -83,59 +85,38 @@ module RuboCop
         transform_quoted_attrs(attrs)
       end
 
-      # Transforms quoted attributes: id="value" → id="";
-      # - Attribute name and = are preserved (unless name is a Ruby keyword)
-      # - Value is removed, quotes become empty ("")
-      # - Semicolon and padding spaces are added to maintain byte count
-      # - Ruby keywords (class, for, etc.) are replaced with spaces
-      # - Semicolon is placed to avoid Layout/SpaceBeforeSemicolon violations
-      # Example: id="x" → id=""; (6 bytes both)
-      # Example: class="admin" → ;(12 spaces) (13 bytes both)
-      # Example: id="x" class="admin" → id="";(14 spaces) (20 bytes both)
+      # Transforms quoted attributes by replacing quotes with RuboCop's preferred style.
+      # Ruby keywords (class, for, etc.) are replaced entirely with spaces.
+      # Example: id="x" → id="x" (quotes normalized to preferred style)
+      # Example: class="admin" → (13 spaces) (Ruby keyword)
       # @rbs attrs: String
       def transform_quoted_attrs(attrs) #: String
-        quote = preferred_quote
-        bytes_saved = 0
-        has_non_keyword_attr = false
+        attr_pattern = /([a-zA-Z0-9_-]+)=(["'])(.*?)\2/
 
-        # Match attribute names including Unicode letters (e.g., 属性="value")
-        result = attrs.gsub(/([\p{L}_][\p{L}\p{N}_-]*)=["']([^"']*)["']/) do |match|
-          name = ::Regexp.last_match(1).to_s
-          value = ::Regexp.last_match(2).to_s
-          if ruby_keyword?(name)
-            # Ruby keyword: replace entire attribute with spaces
-            " " * match.bytesize
+        attrs.gsub(attr_pattern) do
+          match = ::Regexp.last_match
+          next "" unless match
+
+          key = match[1].to_s
+          full_match = match[0].to_s
+          value = full_match[(key.size + 1)..]
+
+          if ruby_keyword?(key)
+            " " * full_match.bytesize
           else
-            bytes_saved += value.bytesize
-            has_non_keyword_attr = true
-            "#{name}=#{quote}#{quote}"
+            # Replace quotes in value with spaces, then wrap with preferred quote
+            inner = value.to_s.gsub(/['"]/, " ")[1..-2]
+            "#{key}=#{preferred_quote}#{inner}#{preferred_quote}"
           end
         end
-
-        # Add semicolon and pad with spaces to match original byte count
-        # Place semicolon to avoid Layout/SpaceBeforeSemicolon
-        if has_non_keyword_attr
-          # Put semicolon right after the last empty quotes, then spaces
-          with_semicolon = result.sub(/#{Regexp.escape(quote)}(?=[^#{Regexp.escape(quote)}]*\z)/, "#{quote};")
-          "#{with_semicolon}#{" " * (bytes_saved - 1)}"
-        else
-          # All attributes were keywords, put semicolon at the start
-          ";#{result[1...]}"
-        end
       end
-
-      RUBY_KEYWORDS = %w[
-        BEGIN END alias and begin break case class def defined? do else elsif end
-        ensure false for if in module next nil not or redo rescue retry return self
-        super then true undef unless until when while yield __ENCODING__ __FILE__ __LINE__
-      ].to_set.freeze #: Set[String]
-      private_constant :RUBY_KEYWORDS
 
       # @rbs name: String
       def ruby_keyword?(name) #: bool
         RUBY_KEYWORDS.include?(name)
       end
 
+      # Returns the preferred quote character based on RuboCop config
       def preferred_quote #: String
         return '"' unless config
 

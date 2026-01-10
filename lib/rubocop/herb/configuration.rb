@@ -19,6 +19,7 @@ module RuboCop
         "Layout/IndentationWidth",        # Ruby code in HTML+ERB files may have different indentation width
         "Layout/InitialIndentation",      # Ruby code in HTML+ERB files may have different indentation rules
         "Layout/LeadingEmptyLines",       # Non-Ruby tags may be inserted before Ruby code
+        "Layout/SpaceBeforeFirstArg",     # HTML tags followed by spaces from Ruby keyword attrs create extra spaces
         "Layout/TrailingEmptyLines",      # Layout cops may conflict with ERB template formatting
         "Layout/TrailingWhitespace",      # Extracted Ruby code from ERB may have trailing whitespace
         "Lint/EmptyConditionalBody",      # Control flow bodies may contain only HTML (no Ruby code)
