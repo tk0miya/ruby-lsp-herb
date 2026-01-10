@@ -6,7 +6,7 @@ require "ruby-lsp-herb"
 require "tempfile"
 require "yaml"
 
-RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable RSpec/DescribeClass
+RSpec.describe "RuboCop::Herb lint integration" do # rubocop:disable RSpec/DescribeClass
   let(:config_file) do
     Tempfile.new([".rubocop", ".yml"], Dir.pwd).tap do |f|
       f.write(YAML.dump(RuboCop::Herb::Configuration.to_rubocop_config))

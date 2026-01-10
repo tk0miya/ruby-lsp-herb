@@ -12,7 +12,9 @@ module RuboCop
       # Cops to exclude from ERB files due to whitespace padding and ERB tag formatting
       EXCLUDED_COPS = [
         "Layout/BlockAlignment",          # Block alignment differs due to ERB tag length differences (<%= vs <%)
+        "Layout/CaseIndentation",         # Case/when indentation differs due to offset adjustment for autocorrect
         "Layout/CommentIndentation",      # ERB comment to Ruby comment conversion shifts column position
+        "Layout/ElseAlignment",           # Else/elsif alignment differs due to offset adjustment for autocorrect
         "Layout/EndAlignment",            # ERB tags have different lengths, making end alignment appear incorrect
         "Layout/ExtraSpacing",            # Whitespace padding preserves character positions but creates extra spaces
         "Layout/IndentationConsistency",  # Ruby code in HTML+ERB files may be aligned differently
@@ -23,12 +25,19 @@ module RuboCop
         "Layout/TrailingWhitespace",      # Extracted Ruby code from ERB may have trailing whitespace
         "Lint/EmptyConditionalBody",      # Control flow bodies may contain only HTML (no Ruby code)
         "Lint/EmptyWhen",                 # Case/when bodies may contain only HTML (no Ruby code)
+        "Lint/Void",                      # Multiple output tags on same line appear as void expressions
         "Style/EmptyElse",                # Else branches may contain only HTML (no Ruby code)
         "Style/FrozenStringLiteralComment", # ERB files don't have frozen string literal comments
         "Style/IfUnlessModifier",         # Conditional HTML wrapping is extracted as single line
         "Style/IfWithSemicolon",          # Semicolons are inserted between ERB tags on the same line
         "Style/Next",                     # `next unless` style is less readable than if/end in ERB templates
         "Style/Semicolon"                 # Semicolons are inserted between ERB tags on the same line
+      ].freeze #: Array[String]
+
+      # Cops where autocorrect is disabled but linting is enabled
+      # These cops produce false positives in autocorrect that break ERB structure
+      AUTOCORRECT_DISABLED_COPS = [
+        "Style/IdenticalConditionalBranches" # HTML tags appear identical, autocorrect breaks ERB structure
       ].freeze #: Array[String]
 
       class << self
@@ -45,9 +54,13 @@ module RuboCop
         def to_rubocop_config #: Hash[String, untyped]
           globs = @supported_extensions.map { |ext| "**/*#{ext}" }
 
+          # @type var config: Hash[String, untyped]
           config = { "AllCops" => { "Include" => globs } }
           EXCLUDED_COPS.each do |cop|
             config[cop] = { "Exclude" => globs }
+          end
+          AUTOCORRECT_DISABLED_COPS.each do |cop|
+            config[cop] = { "AutoCorrect" => "disabled" }
           end
           config
         end

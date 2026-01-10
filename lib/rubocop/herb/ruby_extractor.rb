@@ -39,9 +39,17 @@ module RuboCop
         unified_source = build_unified_ruby_source(parse_result)
         return [] if unified_source.nil?
 
+        # Workaround: Use offset: 1 to force RuboCop to use import! instead of merge!
+        # When offset is 0, RuboCop uses merge! which requires the same source_buffer,
+        # causing auto correct to fail with "TreeRewriter are not for the same source_buffer".
+        # With offset: 1, import! is used which handles different source_buffers correctly.
+        #
+        # Replace "_ =" with "   " so that removing the first character doesn't break syntax.
+        adjusted_source = unified_source.sub(/^_ =/, "   ")
+        truncated_source = adjusted_source[1..] || "" #: String
         [{
-          offset: 0,
-          processed_source: build_processed_source(unified_source)
+          offset: 1,
+          processed_source: build_processed_source(truncated_source)
         }]
       end
 

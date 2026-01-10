@@ -122,7 +122,9 @@ bin/steep check
 ### Unit Tests vs Integration Tests
 
 - **Unit Tests** (`spec/`): Tests that verify functionality independently without external dependencies. Place tests here when the component can be tested in isolation.
-- **Integration Tests** (`spec/rubocop/herb/integration_spec.rb`): Tests that require RuboCop integration. Place tests here when verifying end-to-end behavior with RuboCop.
+- **Integration Tests** (`spec/rubocop/herb/integration/`): Tests that require RuboCop integration. Place tests here when verifying end-to-end behavior with RuboCop.
+  - `lint_spec.rb` - Tests for offense detection (linting)
+  - `autocorrect_spec.rb` - Tests for auto-correction functionality
 
 ### Integration Test Assertions
 
