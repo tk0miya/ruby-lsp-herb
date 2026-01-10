@@ -5,15 +5,28 @@ module RuboCop
     # Class for transforming HTML tags to Ruby code while preserving byte length.
     #
     # Transformation rules:
-    #   Opening tag (no attrs): <div>        → "div; "        (5 bytes)
-    #   Opening tag (attrs):    <div id="x"> → 'div "d= x"; ' (12 bytes)
-    #   Closing tag:            </div>       → "div0; "       (6 bytes, counter rotates 0-9)
+    #   Opening tag (no attrs):    <div>                        → "div; "
+    #   Opening tag (single attr): <div id="foo">               → ' div id="fo"; '
+    #   Opening tag (multi attrs): <div id="foo" value="bar">   → ' div id="foo  value= ba"; '
+    #   Closing tag:               </div>                       → "div0; " (counter rotates 0-9)
     #
-    # For multibyte characters, padding with spaces is used to preserve byte length:
-    #   <div 属性="x"> → 'div "  性= x"; ' (属 is 3 bytes → " + 2 spaces)
+    # For attributes with values, the first attribute name is preserved to make
+    # RuboCop lint messages more readable and help users identify the original HTML.
+    # All subsequent attributes are represented as part of the first attribute's value.
+    # The last character is trimmed to make room for the closing quote and semicolon.
+    #
+    # For multibyte characters, padding with spaces is used to preserve byte length.
     class HtmlTagTransformer
       OPEN_TAG_PATTERN = /\A<([a-zA-Z0-9]+)(\s*)(.*)>\z/m
       CLOSE_TAG_PATTERN = %r{\A</([a-zA-Z0-9]+)>\z}
+      VALUED_ATTR_PATTERN = /\A([a-zA-Z0-9]+?=)(.*)/m
+
+      # Ruby keywords that cannot be used as method names/identifiers
+      RUBY_KEYWORDS = %w[
+        BEGIN END alias and begin break case class def defined? do else elsif
+        end ensure false for if in module next nil not or redo rescue retry
+        return self super then true undef unless until when while yield
+      ].freeze
 
       attr_reader :config #: RuboCop::Config?
 
@@ -32,10 +45,9 @@ module RuboCop
         match = source.match(OPEN_TAG_PATTERN)
         return nil unless match
 
-        tag_name, space, attrs = match.captures
-        attrs = transform_attrs(attrs.to_s)
-
-        build_result("#{tag_name}#{space}#{attrs}; ", position, location)
+        tag_name, space, attrs_str = match.captures
+        content = build_open_tag_content(tag_name.to_s, space.to_s, attrs_str.to_s)
+        build_result(content, position, location)
       end
 
       # @rbs source: String
@@ -50,19 +62,75 @@ module RuboCop
 
       private
 
+      # @rbs tag_name: String
+      # @rbs space: String
+      # @rbs attrs_str: String
+      def build_open_tag_content(tag_name, space, attrs_str) #: String
+        if attrs_str.empty? || attrs_str.length < 2
+          # No attrs or very short attrs - use old format
+          "#{tag_name}#{space}#{" " * attrs_str.bytesize}; "
+        elsif (match = attrs_str.match(VALUED_ATTR_PATTERN))
+          build_valued_attrs_content(tag_name, space, attrs_str, match[1].to_s, match[2].to_s)
+        else
+          # Boolean attrs - use old format
+          "#{tag_name}#{space}#{transform_boolean_attrs(attrs_str)}; "
+        end
+      end
+
+      # @rbs tag_name: String
+      # @rbs space: String
+      # @rbs attrs_str: String
+      # @rbs attr_prefix: String
+      # @rbs value_part: String
+      def build_valued_attrs_content(tag_name, space, attrs_str, attr_prefix, value_part) #: String
+        attr_name = attr_prefix.chop # Remove trailing '='
+        if RUBY_KEYWORDS.include?(attr_name)
+          # Keyword attr name - use old format to avoid syntax errors
+          "#{tag_name}#{space}#{transform_keyword_attrs(attrs_str)}; "
+        else
+          # Valued attrs - leading space, trailing space, attrs trimmed by 1 byte
+          " #{tag_name}#{space}#{transform_valued_attrs(attr_prefix, value_part)}; "
+        end
+      end
+
       def next_close_tag_count #: Integer
         @close_tag_counter = (@close_tag_counter + 1) % 10
       end
 
-      # @rbs attrs: String
-      def transform_attrs(attrs) #: String
-        return " " * attrs.bytesize if attrs.length < 2
+      # Transform attributes when the first attribute has a value (e.g., foo="bar").
+      # Preserves the attribute name and converts all subsequent content into the value.
+      # Trims the last character to make room for the trailing "; " after attrs.
+      # @rbs attr_prefix: String
+      # @rbs value_part: String
+      def transform_valued_attrs(attr_prefix, value_part) #: String
+        # Replace all quotes with spaces in value part
+        value = value_part.gsub(/["']/, " ")
 
-        transform_quoted_attrs(attrs)
+        # Set opening quote at start of value
+        value[0] = convert_quote_char(value[0])
+
+        # Trim last char and set closing quote (makes room for "; " suffix)
+        value = value[0..-2]
+        return attr_prefix if value.nil? || value.empty?
+
+        value[-1] = convert_quote_char(value[-1])
+        attr_prefix + value
       end
 
+      # Transform attributes when the first attribute is boolean (no value).
+      # Uses the original format without trimming (no leading space in result).
       # @rbs attrs: String
-      def transform_quoted_attrs(attrs) #: String
+      def transform_boolean_attrs(attrs) #: String
+        attrs.gsub(/["']/, " ").tap do |result|
+          result[0] = convert_quote_char(result[0])
+          result[-1] = convert_quote_char(result[-1])
+        end
+      end
+
+      # Transform attributes when the first attribute name is a Ruby keyword.
+      # Uses the original format (replacing first char with quote) to avoid syntax errors.
+      # @rbs attrs: String
+      def transform_keyword_attrs(attrs) #: String
         attrs.gsub(/["']/, " ").tap do |result|
           result[0] = convert_quote_char(result[0])
           result[-1] = convert_quote_char(result[-1])
