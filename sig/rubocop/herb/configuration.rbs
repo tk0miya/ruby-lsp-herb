@@ -12,6 +12,10 @@ module RuboCop
       # Cops to exclude from ERB files due to whitespace padding and ERB tag formatting
       EXCLUDED_COPS: Array[String]
 
+      # Cops where autocorrect is disabled but linting is enabled
+      # These cops produce false positives in autocorrect that break ERB structure
+      AUTOCORRECT_DISABLED_COPS: Array[String]
+
       # @rbs config: Hash[String, untyped]
       def self.setup: (Hash[String, untyped] config) -> void
 
