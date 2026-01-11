@@ -69,7 +69,7 @@ module RubyLsp
           level = rubocop_severity_to_prism_level(offense.severity.name)
           location = rubocop_offense_location_to_prism(prism_source, offense)
           message = "[#{offense.cop_name}] #{offense.message}"
-          if %i[error fatal].include?(offense.severity.name)
+          if level == :error
             errors << Prism::ParseError.new(level, message, location, level)
           else
             warnings << Prism::ParseWarning.new(level, message, location, level)
