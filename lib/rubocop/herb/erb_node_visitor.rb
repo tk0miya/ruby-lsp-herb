@@ -2,6 +2,7 @@
 
 require "herb"
 require_relative "block_stackable"
+require_relative "erb_node_detector"
 require_relative "html_tag_transformer"
 require_relative "placeholder_builder"
 require_relative "ruby_comment_builder"
@@ -212,6 +213,9 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
       def visit_html_open_tag(node) #: void
+        # Skip transformation if attributes contain ERB tags to avoid conflicts
+        return if ErbNodeDetector.detect?(node)
+
         position = node.tag_opening.range.from
         source = bytes_to_string(position, node.tag_closing.range.to)
 
