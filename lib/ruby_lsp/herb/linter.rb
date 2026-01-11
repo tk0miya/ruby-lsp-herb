@@ -13,25 +13,15 @@ module RubyLsp
         @filename = args.first
       end
 
-      def run #: void # rubocop:disable Metrics/AbcSize
+      def run #: void
         raise "Filename is required" unless filename
         raise "File not found: #{filename}" unless File.exist?(filename)
 
         content = File.read(filename)
         analyzer = ErbAnalyzer.new(nil, content)
-        result = analyzer.analyze
+        result = analyzer.to_prism_parse_result
 
-        if result.errors.present?
-          puts "Parse error:"
-          result.errors.each do |error|
-            puts "- #{error.message} at #{filename}:#{error.location.start.line}:#{error.location.start.column}"
-          end
-        elsif result.warnings.present?
-          puts "Warnings:"
-          result.warnings.each do |warning|
-            puts "- #{warning.message} at #{filename}:#{warning.location.start.line}:#{warning.location.start.column}"
-          end
-        end
+        puts result.inspect
       end
     end
 

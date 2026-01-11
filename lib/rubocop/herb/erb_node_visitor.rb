@@ -2,6 +2,7 @@
 
 require "herb"
 require_relative "block_stackable"
+require_relative "erb_node_detector"
 require_relative "html_tag_transformer"
 require_relative "placeholder_builder"
 require_relative "ruby_comment_builder"
@@ -213,7 +214,7 @@ module RuboCop
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
       def visit_html_open_tag(node) #: void
         # Skip transformation if attributes contain ERB tags to avoid conflicts
-        return if erb_in_attributes?(node)
+        return if ErbNodeDetector.detect?(node)
 
         position = node.tag_opening.range.from
         source = bytes_to_string(position, node.tag_closing.range.to)
@@ -325,17 +326,6 @@ module RuboCop
       def bytes_to_string(start_pos, end_pos) #: String
         bytes = source_bytes[start_pos...end_pos] #: Array[Integer]
         bytes.pack("C*").force_encoding(encoding)
-      end
-
-      # Checks if the HTML open tag has any ERB tags in its attribute values.
-      # @rbs node: ::Herb::AST::HTMLOpenTagNode
-      def erb_in_attributes?(node) #: bool
-        node.children.any? do |attr|
-          next false unless attr.is_a?(::Herb::AST::HTMLAttributeNode)
-          next false unless attr.value
-
-          attr.value.children.any? { |child| child.is_a?(::Herb::AST::ERBContentNode) }
-        end
       end
 
       def adjust_last_output_prefix! #: void

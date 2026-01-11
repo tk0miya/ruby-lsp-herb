@@ -344,6 +344,18 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
         end
       end
 
+      context "with conditional attribute using ERB if" do
+        let(:source) { '<div <% if admin? %>class="admin"<% end %>>content</div>' }
+
+        it "skips HTML open tag and extracts ERB if/end" do
+          expect(subject.size).to eq(4)
+          expect(subject[0]).to have_attributes(code: "   if admin?;")
+          expect(subject[1]).to have_attributes(code: "_ = nil;") # placeholder
+          expect(subject[2]).to have_attributes(code: "   end;")
+          expect(subject[3]).to have_attributes(content: "div1; ")
+        end
+      end
+
       context "with ERB and surrounding text in attribute" do
         let(:source) { '<div class="prefix-<%= klass %>-suffix">content</div>' }
 
