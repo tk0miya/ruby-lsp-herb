@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "uri"
 require "herb"
 require "active_support/all"
 
@@ -18,19 +19,23 @@ module RubyLsp
         raise "File not found: #{filename}" unless File.exist?(filename)
 
         content = File.read(filename)
-        analyzer = ErbAnalyzer.new(nil, content)
-        result = analyzer.analyze
+        uri = URI::File.build(path: File.expand_path(filename))
+        result = ErbAnalyzer.new(uri, content).analyze.to_prism_parse_result
 
-        if result.errors.present?
-          puts "Parse error:"
+        if result.errors.any?
+          puts "Errors:"
           result.errors.each do |error|
-            puts "- #{error.message} at #{filename}:#{error.location.start.line}:#{error.location.start.column}"
+            location = error.location
+            puts "- #{error.message} at #{filename}:#{location.start_line}:#{location.start_column}"
           end
-        elsif result.warnings.present?
-          puts "Warnings:"
-          result.warnings.each do |warning|
-            puts "- #{warning.message} at #{filename}:#{warning.location.start.line}:#{warning.location.start.column}"
-          end
+        end
+
+        return unless result.warnings.any?
+
+        puts "Warnings:"
+        result.warnings.each do |warning|
+          location = warning.location
+          puts "- #{warning.message} at #{filename}:#{location.start_line}:#{location.start_column}"
         end
       end
     end

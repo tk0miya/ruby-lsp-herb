@@ -9,11 +9,17 @@ module RubyLsp
 
       attr_reader source: String
 
+      attr_reader herb_parse_result: ::Herb::ParseResult?
+
+      attr_reader herb_warnings: Array[::Herb::Warnings::Warning]
+
+      attr_reader rubocop_offenses: Array[RuboCop::Cop::Offense]
+
       # @rbs uri: URI::Generic?
       # @rbs source: String
       def initialize: (URI::Generic? uri, String source) -> void
 
-      def analyze: () -> ::Herb::ParseResult
+      def analyze: () -> self
 
       def to_prism_parse_result: () -> Prism::ParseResult
 
@@ -24,7 +30,14 @@ module RubyLsp
 
       # @rbs prism_source: Prism::Source
       # @rbs location: ::Herb::Location
-      def convert_location: (Prism::Source prism_source, ::Herb::Location location) -> Prism::Location
+      def herb_location_to_prism: (Prism::Source prism_source, ::Herb::Location location) -> Prism::Location
+
+      # @rbs prism_source: Prism::Source
+      # @rbs offense: RuboCop::Cop::Offense
+      def rubocop_offense_location_to_prism: (Prism::Source prism_source, RuboCop::Cop::Offense offense) -> Prism::Location
+
+      # @rbs severity: Symbol
+      def rubocop_severity_to_prism_level: (Symbol severity) -> Symbol
     end
   end
 end

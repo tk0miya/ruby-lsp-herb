@@ -13,47 +13,13 @@ module RubyLsp
     # Runner class for executing RuboCop on ERB templates using StdinRunner.
     # Uses RuboCop::Herb::RubyExtractor to extract Ruby code from ERB.
     class RuboCopRunner
-      # Result object that holds RuboCop offenses and provides Herb-compatible errors/warnings.
+      # Result object that holds RuboCop offenses.
       class Result
         attr_reader :offenses #: Array[RuboCop::Cop::Offense]
 
         # @rbs offenses: Array[RuboCop::Cop::Offense]
         def initialize(offenses) #: void
           @offenses = offenses
-        end
-
-        def herb_errors #: Array[::Herb::Errors::Error]
-          offenses.filter_map do |offense|
-            next unless %i[error fatal].include?(offense.severity.name)
-
-            location = convert_offense_to_herb_location(offense)
-            message = "[#{offense.cop_name}] #{offense.message}"
-            ::Herb::Errors::Error.new("error", location, message)
-          end
-        end
-
-        def herb_warnings #: Array[::Herb::Warnings::Warning]
-          offenses.filter_map do |offense|
-            next if %i[error fatal].include?(offense.severity.name)
-
-            location = convert_offense_to_herb_location(offense)
-            message = "[#{offense.cop_name}] #{offense.message}"
-            ::Herb::Warnings::Warning.new("warning", location, message)
-          end
-        end
-
-        private
-
-        # Convert RuboCop offense location to Herb::Location
-        # @rbs offense: RuboCop::Cop::Offense
-        def convert_offense_to_herb_location(offense) #: ::Herb::Location
-          # offense.line is 1-based, offense.column is 0-based
-          ::Herb::Location.from(
-            offense.line,
-            offense.column,
-            offense.line,
-            offense.column + offense.location.length
-          )
         end
       end
 
