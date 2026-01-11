@@ -50,6 +50,25 @@ module RuboCop
         build_result(content, position, location)
       end
 
+      # Transforms only the tag name portion of an HTML open tag.
+      # Used when the tag contains ERB in attributes and full transformation is not possible.
+      #
+      # @rbs tag_name: String
+      # @rbs byte_length: Integer
+      # @rbs position: Integer
+      # @rbs location: untyped
+      def transform_tag_name_only(tag_name, byte_length:, position:, location:) #: Result?
+        return nil if byte_length < 5 # Minimum: "x; " (3) + 2 for safety
+
+        # Build content: "tag_name; " padded to match byte_length
+        base_content = "#{tag_name}; "
+        padding_needed = byte_length - base_content.bytesize
+        return nil if padding_needed.negative?
+
+        content = base_content + (" " * padding_needed)
+        build_result(content, position, location)
+      end
+
       # @rbs source: String
       # @rbs position: Integer
       # @rbs location: untyped

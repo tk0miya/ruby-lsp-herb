@@ -124,6 +124,11 @@ module RuboCop
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
       def visit_html_open_tag: (::Herb::AST::HTMLOpenTagNode node) -> void
 
+      # Transforms only the tag name portion when ERB is present in the tag.
+      # @rbs node: ::Herb::AST::HTMLOpenTagNode
+      # @rbs first_erb_position: Integer
+      def transform_tag_name_only: (::Herb::AST::HTMLOpenTagNode node, Integer first_erb_position) -> Result?
+
       # @rbs node: ::Herb::AST::HTMLCloseTagNode
       def visit_html_close_tag: (::Herb::AST::HTMLCloseTagNode node) -> void
 

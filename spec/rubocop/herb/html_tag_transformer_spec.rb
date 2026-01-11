@@ -194,6 +194,70 @@ RSpec.describe RuboCop::Herb::HtmlTagTransformer do
     end
   end
 
+  describe "#transform_tag_name_only" do
+    subject { transformer.transform_tag_name_only(tag_name, byte_length:, position:, location:) }
+
+    let(:position) { 0 }
+
+    context "with sufficient byte length" do
+      let(:tag_name) { "div" }
+      let(:byte_length) { 5 } # "<div " = 5 bytes
+
+      it "transforms to tag name with semicolon" do
+        expect(subject).to have_attributes(content: "div; ", position: 0, location:)
+        expect(subject.content.bytesize).to eq(5)
+      end
+    end
+
+    context "with extra byte length" do
+      let(:tag_name) { "div" }
+      let(:byte_length) { 8 }
+
+      it "pads with spaces to match byte length" do
+        expect(subject.content).to eq("div;    ")
+        expect(subject.content.bytesize).to eq(8)
+      end
+    end
+
+    context "with longer tag name" do
+      let(:tag_name) { "section" }
+      let(:byte_length) { 10 }
+
+      it "transforms correctly" do
+        expect(subject.content).to eq("section;  ")
+        expect(subject.content.bytesize).to eq(10)
+      end
+    end
+
+    context "with insufficient byte length" do
+      let(:tag_name) { "div" }
+      let(:byte_length) { 4 } # Too short for "div; " (5 bytes)
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with very short byte length" do
+      let(:tag_name) { "a" }
+      let(:byte_length) { 3 } # Below minimum of 5
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with position" do
+      let(:tag_name) { "div" }
+      let(:byte_length) { 5 }
+      let(:position) { 10 }
+
+      it "sets position in result" do
+        expect(subject.position).to eq(10)
+      end
+    end
+  end
+
   describe "preferred_quote" do
     subject { transformer.transform_open_tag('<div id="x">', position: 0, location:).content }
 

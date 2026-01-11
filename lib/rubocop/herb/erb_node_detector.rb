@@ -15,8 +15,17 @@ module RuboCop
         detector.found?
       end
 
+      # Returns the starting position of the earliest (by byte position) ERB node, or nil if none.
+      # @rbs node: untyped
+      def self.first_erb_position(node) #: Integer?
+        detector = new
+        detector.visit(node)
+        detector.first_position
+      end
+
       def initialize #: void
         @found = false
+        @first_position = nil #: Integer?
         super
       end
 
@@ -24,37 +33,46 @@ module RuboCop
         @found
       end
 
-      # Stop traversal once an ERB node is found.
-      # @rbs node: untyped
-      def visit(node) #: void
-        return if @found
+      attr_reader :first_position #: Integer?
 
+      # @rbs node: ::Herb::AST::ERBContentNode
+      def visit_erb_content_node(node) #: void
+        update_first_position(node.tag_opening.range.from)
         super
       end
 
-      # @rbs _node: ::Herb::AST::ERBContentNode
-      def visit_erb_content_node(_node) #: void
-        @found = true
+      # @rbs node: ::Herb::AST::ERBBlockNode
+      def visit_erb_block_node(node) #: void
+        update_first_position(node.tag_opening.range.from)
+        super
       end
 
-      # @rbs _node: ::Herb::AST::ERBBlockNode
-      def visit_erb_block_node(_node) #: void
-        @found = true
+      # @rbs node: ::Herb::AST::ERBIfNode
+      def visit_erb_if_node(node) #: void
+        update_first_position(node.tag_opening.range.from)
+        super
       end
 
-      # @rbs _node: ::Herb::AST::ERBIfNode
-      def visit_erb_if_node(_node) #: void
-        @found = true
+      # @rbs node: ::Herb::AST::ERBUnlessNode
+      def visit_erb_unless_node(node) #: void
+        update_first_position(node.tag_opening.range.from)
+        super
       end
 
-      # @rbs _node: ::Herb::AST::ERBUnlessNode
-      def visit_erb_unless_node(_node) #: void
-        @found = true
+      # @rbs node: ::Herb::AST::ERBCaseNode
+      def visit_erb_case_node(node) #: void
+        update_first_position(node.tag_opening.range.from)
+        super
       end
 
-      # @rbs _node: ::Herb::AST::ERBCaseNode
-      def visit_erb_case_node(_node) #: void
+      private
+
+      # Updates first_position to the smallest (earliest) position found.
+      # @rbs position: Integer
+      def update_first_position(position) #: void
         @found = true
+        current = @first_position
+        @first_position = position if current.nil? || position < current
       end
     end
   end

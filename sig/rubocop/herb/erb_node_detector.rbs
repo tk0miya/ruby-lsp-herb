@@ -9,28 +9,36 @@ module RuboCop
       # @rbs node: untyped
       def self.detect?: (untyped node) -> bool
 
+      # Returns the starting position of the earliest (by byte position) ERB node, or nil if none.
+      # @rbs node: untyped
+      def self.first_erb_position: (untyped node) -> Integer?
+
       def initialize: () -> void
 
       def found?: () -> bool
 
-      # Stop traversal once an ERB node is found.
-      # @rbs node: untyped
-      def visit: (untyped node) -> void
+      attr_reader first_position: Integer?
 
-      # @rbs _node: ::Herb::AST::ERBContentNode
-      def visit_erb_content_node: (untyped _node) -> void
+      # @rbs node: ::Herb::AST::ERBContentNode
+      def visit_erb_content_node: (::Herb::AST::ERBContentNode node) -> void
 
-      # @rbs _node: ::Herb::AST::ERBBlockNode
-      def visit_erb_block_node: (untyped _node) -> void
+      # @rbs node: ::Herb::AST::ERBBlockNode
+      def visit_erb_block_node: (::Herb::AST::ERBBlockNode node) -> void
 
-      # @rbs _node: ::Herb::AST::ERBIfNode
-      def visit_erb_if_node: (untyped _node) -> void
+      # @rbs node: ::Herb::AST::ERBIfNode
+      def visit_erb_if_node: (::Herb::AST::ERBIfNode node) -> void
 
-      # @rbs _node: ::Herb::AST::ERBUnlessNode
-      def visit_erb_unless_node: (untyped _node) -> void
+      # @rbs node: ::Herb::AST::ERBUnlessNode
+      def visit_erb_unless_node: (::Herb::AST::ERBUnlessNode node) -> void
 
-      # @rbs _node: ::Herb::AST::ERBCaseNode
-      def visit_erb_case_node: (untyped _node) -> void
+      # @rbs node: ::Herb::AST::ERBCaseNode
+      def visit_erb_case_node: (::Herb::AST::ERBCaseNode node) -> void
+
+      private
+
+      # Updates first_position to the smallest (earliest) position found.
+      # @rbs position: Integer
+      def update_first_position: (Integer position) -> void
     end
   end
 end

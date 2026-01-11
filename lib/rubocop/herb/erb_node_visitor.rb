@@ -213,14 +213,38 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
       def visit_html_open_tag(node) #: void
-        # Skip transformation if attributes contain ERB tags to avoid conflicts
-        return if ErbNodeDetector.detect?(node)
+        first_erb_position = ErbNodeDetector.first_erb_position(node)
 
-        position = node.tag_opening.range.from
-        source = bytes_to_string(position, node.tag_closing.range.to)
+        result = if first_erb_position
+                   # ERB found in tag - transform only the tag name portion if possible
+                   transform_tag_name_only(node, first_erb_position)
+                 else
+                   # No ERB - transform the entire tag
+                   position = node.tag_opening.range.from
+                   source = bytes_to_string(position, node.tag_closing.range.to)
+                   html_tag_transformer.transform_open_tag(source, position:, location: node.location)
+                 end
 
-        result = html_tag_transformer.transform_open_tag(source, position:, location: node.location)
         push_node(result) if result
+      end
+
+      # Transforms only the tag name portion when ERB is present in the tag.
+      # @rbs node: ::Herb::AST::HTMLOpenTagNode
+      # @rbs first_erb_position: Integer
+      def transform_tag_name_only(node, first_erb_position) #: Result?
+        tag_start = node.tag_opening.range.from
+        tag_name_end = node.tag_name.range.to
+
+        # Calculate the safe end position (tag name end + 1 for space, but not past ERB)
+        safe_end = [tag_name_end + 1, first_erb_position].min
+        byte_length = safe_end - tag_start
+
+        html_tag_transformer.transform_tag_name_only(
+          node.tag_name.value,
+          byte_length:,
+          position: tag_start,
+          location: node.location
+        )
       end
 
       # @rbs node: ::Herb::AST::HTMLCloseTagNode

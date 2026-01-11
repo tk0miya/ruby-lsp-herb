@@ -38,6 +38,15 @@ module RuboCop
       # @rbs location: untyped
       def transform_open_tag: (String source, position: Integer, location: untyped) -> Result?
 
+      # Transforms only the tag name portion of an HTML open tag.
+      # Used when the tag contains ERB in attributes and full transformation is not possible.
+      #
+      # @rbs tag_name: String
+      # @rbs byte_length: Integer
+      # @rbs position: Integer
+      # @rbs location: untyped
+      def transform_tag_name_only: (String tag_name, byte_length: Integer, position: Integer, location: untyped) -> Result?
+
       # @rbs source: String
       # @rbs position: Integer
       # @rbs location: untyped
