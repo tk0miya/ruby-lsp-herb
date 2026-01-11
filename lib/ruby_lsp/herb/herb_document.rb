@@ -16,9 +16,7 @@ module RubyLsp
         return false unless @needs_parsing
 
         @needs_parsing = false
-        analyzer = ErbAnalyzer.new(uri, source)
-        analyzer.analyze
-        @parse_result = analyzer.to_prism_parse_result
+        @parse_result = ErbAnalyzer.new(uri, source).analyze.to_prism_parse_result
         true
       end
 
