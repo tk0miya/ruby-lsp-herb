@@ -39,6 +39,29 @@ module RuboCop
       def same_line?: (Result other) -> bool
     end
 
+    # Visitor to detect if any ERB nodes exist in a subtree.
+    # Used to check if HTML open tags contain ERB in attributes.
+    class ErbDetectorVisitor < ::Herb::Visitor
+      def initialize: () -> void
+
+      def found?: () -> bool
+
+      # @rbs _node: ::Herb::AST::ERBContentNode
+      def visit_erb_content_node: (untyped _node) -> void
+
+      # @rbs _node: ::Herb::AST::ERBBlockNode
+      def visit_erb_block_node: (untyped _node) -> void
+
+      # @rbs _node: ::Herb::AST::ERBIfNode
+      def visit_erb_if_node: (untyped _node) -> void
+
+      # @rbs _node: ::Herb::AST::ERBUnlessNode
+      def visit_erb_unless_node: (untyped _node) -> void
+
+      # @rbs _node: ::Herb::AST::ERBCaseNode
+      def visit_erb_case_node: (untyped _node) -> void
+    end
+
     # Visitor class to transform ERB nodes from Herb AST
     # Collects Result objects from AST traversal
     class ErbNodeVisitor < ::Herb::Visitor
@@ -158,7 +181,8 @@ module RuboCop
       # @rbs end_pos: Integer
       def bytes_to_string: (Integer start_pos, Integer end_pos) -> String
 
-      # Checks if the HTML open tag has any ERB tags in its attribute values.
+      # Checks if the HTML open tag has any ERB nodes anywhere in its subtree.
+      # Uses a visitor to traverse all descendants and detect ERB nodes.
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
       def erb_in_attributes?: (::Herb::AST::HTMLOpenTagNode node) -> bool
 

@@ -41,6 +41,44 @@ module RuboCop
       end
     end
 
+    # Visitor to detect if any ERB nodes exist in a subtree.
+    # Used to check if HTML open tags contain ERB in attributes.
+    class ErbDetectorVisitor < ::Herb::Visitor
+      def initialize #: void
+        @found = false
+        super
+      end
+
+      def found? #: bool
+        @found
+      end
+
+      # @rbs _node: ::Herb::AST::ERBContentNode
+      def visit_erb_content_node(_node) #: void
+        @found = true
+      end
+
+      # @rbs _node: ::Herb::AST::ERBBlockNode
+      def visit_erb_block_node(_node) #: void
+        @found = true
+      end
+
+      # @rbs _node: ::Herb::AST::ERBIfNode
+      def visit_erb_if_node(_node) #: void
+        @found = true
+      end
+
+      # @rbs _node: ::Herb::AST::ERBUnlessNode
+      def visit_erb_unless_node(_node) #: void
+        @found = true
+      end
+
+      # @rbs _node: ::Herb::AST::ERBCaseNode
+      def visit_erb_case_node(_node) #: void
+        @found = true
+      end
+    end
+
     # Visitor class to transform ERB nodes from Herb AST
     # Collects Result objects from AST traversal
     class ErbNodeVisitor < ::Herb::Visitor # rubocop:disable Metrics/ClassLength
@@ -327,15 +365,13 @@ module RuboCop
         bytes.pack("C*").force_encoding(encoding)
       end
 
-      # Checks if the HTML open tag has any ERB tags in its attribute values.
+      # Checks if the HTML open tag has any ERB nodes anywhere in its subtree.
+      # Uses a visitor to traverse all descendants and detect ERB nodes.
       # @rbs node: ::Herb::AST::HTMLOpenTagNode
       def erb_in_attributes?(node) #: bool
-        node.children.any? do |attr|
-          next false unless attr.is_a?(::Herb::AST::HTMLAttributeNode)
-          next false unless attr.value
-
-          attr.value.children.any? { |child| child.is_a?(::Herb::AST::ERBContentNode) }
-        end
+        detector = ErbDetectorVisitor.new
+        node.children.each { |child| child.accept(detector) }
+        detector.found?
       end
 
       def adjust_last_output_prefix! #: void
