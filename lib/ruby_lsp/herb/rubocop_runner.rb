@@ -68,7 +68,7 @@ module RubyLsp
           config_file.close
 
           ::RuboCop::ConfigStore.new.tap do |store|
-            store.options_config = config_file.path
+            store.options_config = config_file.path || ""
           end
         ensure
           config_file.unlink
