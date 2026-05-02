@@ -41,13 +41,10 @@ module RuboCop
       def calculate_position(start_result, end_node) #: Integer?
         start_node = start_result.node
         return nil unless start_node
+        return nil unless start_node.tag_closing && end_node.tag_opening
 
-        start_tag_closing = start_node.tag_closing
-        end_tag_opening = end_node.tag_opening
-        return nil unless start_tag_closing && end_tag_opening
-
-        start_pos = start_tag_closing.range.to
-        end_pos = end_tag_opening.range.from
+        start_pos = start_node.tag_closing.range.to
+        end_pos = end_node.tag_opening.range.from
 
         range_bytes = source_bytes[start_pos...end_pos]
         return nil unless range_bytes
