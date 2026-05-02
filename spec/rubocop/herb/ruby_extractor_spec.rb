@@ -48,7 +48,7 @@ RSpec.describe RuboCop::Herb::RubyExtractor do
                                        {
                                          offset: 0,
                                          processed_source: an_instance_of(RuboCop::ProcessedSource)
-                                                             .and(have_attributes(raw_source: expected))
+                                                           .and(have_attributes(raw_source: expected))
                                        }
                                      ])
           end
