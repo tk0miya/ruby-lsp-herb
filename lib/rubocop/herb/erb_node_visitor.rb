@@ -192,9 +192,11 @@ module RuboCop
       # --- HTML element nodes ---
       # @rbs node: ::Herb::AST::HTMLElementNode
       def visit_html_element_node(node) #: void
-        visit_html_open_tag(node.open_tag) if node.open_tag
+        open_tag = node.open_tag
+        visit_html_open_tag(open_tag) if open_tag.is_a?(::Herb::AST::HTMLOpenTagNode)
         super
-        visit_html_close_tag(node.close_tag) if node.close_tag
+        close_tag = node.close_tag
+        visit_html_close_tag(close_tag) if close_tag.is_a?(::Herb::AST::HTMLCloseTagNode)
       end
 
       # --- Document node (root) ---
@@ -216,8 +218,12 @@ module RuboCop
         # Skip transformation if attributes contain ERB tags to avoid conflicts
         return if ErbNodeDetector.detect?(node)
 
-        position = node.tag_opening.range.from
-        source = bytes_to_string(position, node.tag_closing.range.to)
+        tag_opening = node.tag_opening
+        tag_closing = node.tag_closing
+        return unless tag_opening && tag_closing
+
+        position = tag_opening.range.from
+        source = bytes_to_string(position, tag_closing.range.to)
 
         result = html_tag_transformer.transform_open_tag(source, position:, location: node.location)
         push_node(result) if result
@@ -225,8 +231,12 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::HTMLCloseTagNode
       def visit_html_close_tag(node) #: void
-        position = node.tag_opening.range.from
-        source = bytes_to_string(position, node.tag_closing.range.to)
+        tag_opening = node.tag_opening
+        tag_closing = node.tag_closing
+        return unless tag_opening && tag_closing
+
+        position = tag_opening.range.from
+        source = bytes_to_string(position, tag_closing.range.to)
 
         result = html_tag_transformer.transform_close_tag(source, position:, location: node.location)
         push_node(result) if result
@@ -234,25 +244,29 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def output_tag?(node) #: bool
-        TagOpenings.output?(node.tag_opening.value)
+        TagOpenings.output?(node.tag_opening&.value || "")
       end
 
       # @rbs node: ::Herb::AST::erb_nodes
       def comment_tag?(node) #: bool
-        TagOpenings.comment?(node.tag_opening.value)
+        TagOpenings.comment?(node.tag_opening&.value || "")
       end
 
       # @rbs node: ::Herb::AST::ERBIfNode
       def elsif_node?(node) #: bool
-        node.content.value.lstrip.start_with?("elsif")
+        (node.content&.value || "").lstrip.start_with?("elsif")
       end
 
       # @rbs node: ::Herb::AST::erb_nodes
       def push_output_tag(node) #: void
+        tag_opening = node.tag_opening
+        tag_closing = node.tag_closing
+        return unless tag_opening && tag_closing
+
         result = Result.new(
-          position: node.tag_opening.range.from,
-          tag_opening: node.tag_opening.value,
-          tag_closing: node.tag_closing.value,
+          position: tag_opening.range.from,
+          tag_opening: tag_opening.value,
+          tag_closing: tag_closing.value,
           prefix: "_ =",
           content: build_ruby_code(node),
           location: node.location,
@@ -263,11 +277,15 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def push_erb_tag(node) #: void
+        tag_opening = node.tag_opening
+        tag_closing = node.tag_closing
+        return unless tag_opening && tag_closing
+
         result = Result.new(
-          position: node.tag_opening.range.from,
-          tag_opening: node.tag_opening.value,
-          tag_closing: node.tag_closing.value,
-          prefix: " " * node.tag_opening.value.size,
+          position: tag_opening.range.from,
+          tag_opening: tag_opening.value,
+          tag_closing: tag_closing.value,
+          prefix: " " * tag_opening.value.size,
           content: build_ruby_code(node),
           location: node.location,
           node:
@@ -280,10 +298,14 @@ module RuboCop
         ruby_comment = build_ruby_comment(node)
         return unless ruby_comment
 
+        tag_opening = node.tag_opening
+        tag_closing = node.tag_closing
+        return unless tag_opening && tag_closing
+
         result = Result.new(
-          position: node.tag_opening.range.from,
-          tag_opening: node.tag_opening.value,
-          tag_closing: node.tag_closing.value,
+          position: tag_opening.range.from,
+          tag_opening: tag_opening.value,
+          tag_closing: tag_closing.value,
           prefix: "  #",
           content: ruby_comment,
           location: node.location,
@@ -313,7 +335,7 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def build_ruby_code(node) #: String
-        value = node.content.value
+        value = node.content&.value || ""
         if value.end_with?(" ")
           value.sub(/ ( *)$/, ';\1')
         else
