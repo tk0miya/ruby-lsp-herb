@@ -192,9 +192,11 @@ module RuboCop
       # --- HTML element nodes ---
       # @rbs node: ::Herb::AST::HTMLElementNode
       def visit_html_element_node(node) #: void
-        visit_html_open_tag(node.open_tag) if node.open_tag
+        open_tag = node.open_tag
+        visit_html_open_tag(open_tag) if open_tag.is_a?(::Herb::AST::HTMLOpenTagNode)
         super
-        visit_html_close_tag(node.close_tag) if node.close_tag
+        close_tag = node.close_tag
+        visit_html_close_tag(close_tag) if close_tag.is_a?(::Herb::AST::HTMLCloseTagNode)
       end
 
       # --- Document node (root) ---
@@ -215,6 +217,7 @@ module RuboCop
       def visit_html_open_tag(node) #: void
         # Skip transformation if attributes contain ERB tags to avoid conflicts
         return if ErbNodeDetector.detect?(node)
+        return unless node.tag_opening && node.tag_closing
 
         position = node.tag_opening.range.from
         source = bytes_to_string(position, node.tag_closing.range.to)
@@ -225,6 +228,8 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::HTMLCloseTagNode
       def visit_html_close_tag(node) #: void
+        return unless node.tag_opening && node.tag_closing
+
         position = node.tag_opening.range.from
         source = bytes_to_string(position, node.tag_closing.range.to)
 
@@ -234,21 +239,29 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def output_tag?(node) #: bool
+        return false unless node.tag_opening
+
         TagOpenings.output?(node.tag_opening.value)
       end
 
       # @rbs node: ::Herb::AST::erb_nodes
       def comment_tag?(node) #: bool
+        return false unless node.tag_opening
+
         TagOpenings.comment?(node.tag_opening.value)
       end
 
       # @rbs node: ::Herb::AST::ERBIfNode
       def elsif_node?(node) #: bool
+        return false unless node.content
+
         node.content.value.lstrip.start_with?("elsif")
       end
 
       # @rbs node: ::Herb::AST::erb_nodes
       def push_output_tag(node) #: void
+        return unless node.tag_opening && node.tag_closing
+
         result = Result.new(
           position: node.tag_opening.range.from,
           tag_opening: node.tag_opening.value,
@@ -263,6 +276,8 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def push_erb_tag(node) #: void
+        return unless node.tag_opening && node.tag_closing
+
         result = Result.new(
           position: node.tag_opening.range.from,
           tag_opening: node.tag_opening.value,
@@ -279,6 +294,7 @@ module RuboCop
       def push_comment_tag(node) #: void
         ruby_comment = build_ruby_comment(node)
         return unless ruby_comment
+        return unless node.tag_opening && node.tag_closing
 
         result = Result.new(
           position: node.tag_opening.range.from,
@@ -313,6 +329,8 @@ module RuboCop
 
       # @rbs node: ::Herb::AST::erb_nodes
       def build_ruby_code(node) #: String
+        return "" unless node.content
+
         value = node.content.value
         if value.end_with?(" ")
           value.sub(/ ( *)$/, ';\1')

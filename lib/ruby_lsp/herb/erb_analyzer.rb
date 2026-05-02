@@ -41,30 +41,43 @@ module RubyLsp
         self
       end
 
-      def to_prism_parse_result #: Prism::ParseResult # rubocop:disable Metrics/AbcSize
+      def to_prism_parse_result #: Prism::ParseResult
         raise "Must call analyze before to_prism_parse_result" unless herb_parse_result
 
         prism_source = build_prism_source(herb_parse_result.source)
+        errors = build_herb_errors(prism_source, herb_parse_result.errors)
+        warnings = build_herb_warnings(prism_source, herb_parse_result.warnings)
+        warnings.concat(build_herb_warnings(prism_source, herb_warnings))
+        apply_rubocop_offenses(prism_source, errors, warnings)
 
-        # Herb parser errors
-        errors = herb_parse_result.errors.map do |error|
+        value = herb_parse_result.value #: untyped
+        Prism::ParseResult.new(value, [], [], nil, errors, warnings, prism_source)
+      end
+
+      private
+
+      # @rbs prism_source: Prism::Source
+      # @rbs errors: Array[::Herb::Errors::Error]
+      def build_herb_errors(prism_source, errors) #: Array[Prism::ParseError]
+        errors.filter_map do |error|
           location = herb_location_to_prism(prism_source, error.location)
-          Prism::ParseError.new(:error, error.message, location, :error)
+          Prism::ParseError.new(:error, error.message, location, :error) if location
         end
+      end
 
-        # Herb parser warnings
-        warnings = herb_parse_result.warnings.map do |warning|
+      # @rbs prism_source: Prism::Source
+      # @rbs warnings: Array[::Herb::Warnings::Warning]
+      def build_herb_warnings(prism_source, warnings) #: Array[Prism::ParseWarning]
+        warnings.filter_map do |warning|
           location = herb_location_to_prism(prism_source, warning.location)
-          Prism::ParseWarning.new(:warning, warning.message, location, :warning)
+          Prism::ParseWarning.new(:warning, warning.message, location, :warning) if location
         end
+      end
 
-        # Herb Lint warnings
-        herb_warnings.each do |warning|
-          location = herb_location_to_prism(prism_source, warning.location)
-          warnings << Prism::ParseWarning.new(:warning, warning.message, location, :warning)
-        end
-
-        # RuboCop offenses (preserving severity)
+      # @rbs prism_source: Prism::Source
+      # @rbs errors: Array[Prism::ParseError]
+      # @rbs warnings: Array[Prism::ParseWarning]
+      def apply_rubocop_offenses(prism_source, errors, warnings) #: void
         rubocop_offenses.each do |offense|
           level = rubocop_severity_to_prism_level(offense.severity.name)
           location = rubocop_offense_location_to_prism(prism_source, offense)
@@ -75,12 +88,7 @@ module RubyLsp
             warnings << Prism::ParseWarning.new(level, message, location, level)
           end
         end
-
-        value = herb_parse_result.value #: untyped
-        Prism::ParseResult.new(value, [], [], nil, errors, warnings, prism_source)
       end
-
-      private
 
       # @rbs source: String
       def build_prism_source(source) #: Prism::Source
@@ -89,8 +97,10 @@ module RubyLsp
       end
 
       # @rbs prism_source: Prism::Source
-      # @rbs location: ::Herb::Location
-      def herb_location_to_prism(prism_source, location) #: Prism::Location
+      # @rbs location: ::Herb::Location?
+      def herb_location_to_prism(prism_source, location) #: Prism::Location?
+        return nil unless location
+
         from = prism_source.offsets[location.start.line - 1] + location.start.column
         to = prism_source.offsets[location.end.line - 1] + location.end.column
         Prism::Location.new(prism_source, from, to - from)

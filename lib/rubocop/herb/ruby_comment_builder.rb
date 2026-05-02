@@ -7,6 +7,8 @@ module RuboCop
     module RubyCommentBuilder
       # @rbs node: ::Herb::AST::ERBContentNode
       def build_ruby_comment(node) #: String?
+        return nil unless node.content
+
         lines = node.content.value.split("\n", -1)
         target_column = node.location.start.column + 2
 

@@ -25,12 +25,25 @@ module RubyLsp
 
       private
 
+      # @rbs prism_source: Prism::Source
+      # @rbs errors: Array[::Herb::Errors::Error]
+      def build_herb_errors: (Prism::Source prism_source, Array[::Herb::Errors::Error] errors) -> Array[Prism::ParseError]
+
+      # @rbs prism_source: Prism::Source
+      # @rbs warnings: Array[::Herb::Warnings::Warning]
+      def build_herb_warnings: (Prism::Source prism_source, Array[::Herb::Warnings::Warning] warnings) -> Array[Prism::ParseWarning]
+
+      # @rbs prism_source: Prism::Source
+      # @rbs errors: Array[Prism::ParseError]
+      # @rbs warnings: Array[Prism::ParseWarning]
+      def apply_rubocop_offenses: (Prism::Source prism_source, Array[Prism::ParseError] errors, Array[Prism::ParseWarning] warnings) -> void
+
       # @rbs source: String
       def build_prism_source: (String source) -> Prism::Source
 
       # @rbs prism_source: Prism::Source
-      # @rbs location: ::Herb::Location
-      def herb_location_to_prism: (Prism::Source prism_source, ::Herb::Location location) -> Prism::Location
+      # @rbs location: ::Herb::Location?
+      def herb_location_to_prism: (Prism::Source prism_source, ::Herb::Location? location) -> Prism::Location?
 
       # @rbs prism_source: Prism::Source
       # @rbs offense: RuboCop::Cop::Offense
