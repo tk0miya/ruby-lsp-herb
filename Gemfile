@@ -14,6 +14,6 @@ gem "rubocop-numbered-params"
 gem "rubocop-rake", "~> 0.7.1"
 gem "rubocop-rspec", "~> 3.9"
 
-gem "rbs-inline", "~> 0.12.0"
+gem "rbs-inline", "~> 0.13.0"
 
 gem "steep", "~> 1.10"
