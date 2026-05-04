@@ -26,7 +26,7 @@ RSpec.describe RubyLsp::Herb::HerbDocument do
 
         expect(messages).to include(match(/unexpected/i))
         # RuboCop offenses should not be present since we skip on parse errors
-        expect(messages.any? { |m| m.start_with?("[") }).to be false
+        expect(messages.any? { _1.start_with?("[") }).to be false
       end
     end
 
@@ -51,7 +51,7 @@ RSpec.describe RubyLsp::Herb::HerbDocument do
           messages = document.parse_result.warnings.map(&:message)
 
           # Should not have any RuboCop-prefixed messages
-          expect(messages.any? { |m| m.start_with?("[") }).to be false
+          expect(messages.any? { _1.start_with?("[") }).to be false
         end
       end
 
@@ -88,7 +88,7 @@ RSpec.describe RubyLsp::Herb::HerbDocument do
 
       it "correctly maps offense location" do
         document = create_document(source)
-        warning = document.parse_result.warnings.find { |w| w.message.include?("[Layout/SpaceInsideParens]") }
+        warning = document.parse_result.warnings.find { _1.message.include?("[Layout/SpaceInsideParens]") }
 
         expect(warning).not_to be_nil
         location = warning.location

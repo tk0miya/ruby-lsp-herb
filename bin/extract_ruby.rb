@@ -11,7 +11,7 @@ parse_result = Herb.parse(source)
 visitor = RuboCop::Herb::ErbNodeVisitor.new(source_bytes, encoding:, config: nil)
 parse_result.visit(visitor)
 
-result_bytes = source_bytes.map { |b| [10, 13].include?(b) ? b : 32 }
+result_bytes = source_bytes.map { [10, 13].include?(_1) ? _1 : 32 }
 visitor.results.each do |r|
   r.code.bytes.each_with_index do |byte, idx|
     result_bytes[r.position + idx] = byte

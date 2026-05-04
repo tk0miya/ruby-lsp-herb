@@ -110,7 +110,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
         let(:source) { "<% items.each do |item| %>\n    HTML\n<% end %>" }
 
         it "includes placeholder Result for empty blocks" do
-          placeholder = subject.find { |r| r.code == "_ = nil;" }
+          placeholder = subject.find { _1.code == "_ = nil;" }
           expect(placeholder).to have_attributes(code: "_ = nil;")
         end
       end
@@ -120,7 +120,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
 
         it "does not include placeholder when space is insufficient" do
           expect(subject.size).to eq(2)
-          placeholder = subject.find { |r| r.code == "_ = nil;" }
+          placeholder = subject.find { _1.code == "_ = nil;" }
           expect(placeholder).to be_nil
         end
       end
