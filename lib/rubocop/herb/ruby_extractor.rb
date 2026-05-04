@@ -63,7 +63,7 @@ module RuboCop
       # @rbs source_bytes: Array[Integer]
       # @rbs results: Array[Result]
       def build_result_bytes(source_bytes, results) #: Array[Integer]
-        result_bytes = source_bytes.map { |b| [LF, CR].include?(b) ? b : SPACE }
+        result_bytes = source_bytes.map { [LF, CR].include?(_1) ? _1 : SPACE }
 
         results.each do |r|
           r.code.bytes.each_with_index do |byte, idx|

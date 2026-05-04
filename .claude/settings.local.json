@@ -48,7 +48,12 @@
       "Bash(ruby:*)",
       "Bash(git stash:*)",
       "Bash(git stash pop:*)",
-      "Bash(bin/rbs collection install:*)"
+      "Bash(bin/rbs collection install:*)",
+      "Bash(gh auth *)",
+      "WebFetch(domain:index.rubygems.org)",
+      "WebFetch(domain:rubygems.org)",
+      "Bash(git commit *)",
+      "Bash(git add *)"
     ]
   },
   "hooks": {

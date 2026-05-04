@@ -14,7 +14,7 @@ RSpec.describe "RuboCop::Herb integration with StdinRunner" do # rubocop:disable
     end
   end
   let(:config_store) do
-    RuboCop::ConfigStore.new.tap { |store| store.options_config = config_file.path }
+    RuboCop::ConfigStore.new.tap { _1.options_config = config_file.path }
   end
   let(:runner) { RuboCop::Lsp::StdinRunner.new(config_store) }
   let(:path) { "test.html.erb" }
