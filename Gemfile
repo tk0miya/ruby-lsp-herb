@@ -12,6 +12,7 @@ gem "rspec", "~> 3.0"
 gem "rubocop", "~> 1.86"
 gem "rubocop-numbered-params"
 gem "rubocop-rake", "~> 0.7.1"
+gem "rubocop-rbs_inline"
 gem "rubocop-rspec", "~> 3.9"
 
 gem "rbs-inline", "~> 0.13.0"

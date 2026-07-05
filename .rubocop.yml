@@ -7,6 +7,7 @@ AllCops:
 plugins:
   - rubocop-numbered-params
   - rubocop-rake
+  - rubocop-rbs_inline
   - rubocop-rspec
 
 # Layout
@@ -51,6 +52,17 @@ Style/Documentation:
 
 Style/HashSyntax:
   EnforcedShorthandSyntax: always
+
+Style/RbsInline/MissingTypeAnnotation:
+  EnforcedStyle: doc_style_and_return_annotation
+  Exclude:
+    - "spec/**/*"
+
+Style/RbsInline/RedundantTypeAnnotation:
+  EnforcedStyle: doc_style_and_return_annotation
+
+Style/RbsInline/RequireRbsInlineComment:
+  EnforcedStyle: never
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
