@@ -48,11 +48,13 @@ module RubyLsp
         super
       end
 
+      # @rbs node: untyped
       def visit_child_nodes(node) #: void
         visit_erb_nodes(node) if node.node_name.start_with?("ERB")
         super
       end
 
+      # @rbs node: untyped
       def visit_erb_nodes(node) #: void
         unless node.content.value.start_with?(" ", "\n")
           warn("ERB tag should start with a space or newline", node.tag_opening.location)
