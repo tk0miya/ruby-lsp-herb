@@ -15,6 +15,8 @@ module RuboCop
         detector.found?
       end
 
+      # @rbs @found: bool
+
       def initialize #: void
         @found = false
         super

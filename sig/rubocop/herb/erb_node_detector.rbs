@@ -9,6 +9,8 @@ module RuboCop
       # @rbs node: untyped
       def self.detect?: (untyped node) -> bool
 
+      @found: bool
+
       def initialize: () -> void
 
       def found?: () -> bool

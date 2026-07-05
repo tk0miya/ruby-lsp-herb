@@ -12,6 +12,8 @@ module RubyLsp
     class HerbDocument < RubyLsp::ERBDocument #[T]
       attr_reader :parse_result #: ::Prism::ParseResult
 
+      # @rbs @needs_parsing: bool
+
       def parse! #: void # rubocop:disable Naming/PredicateMethod
         return false unless @needs_parsing
 

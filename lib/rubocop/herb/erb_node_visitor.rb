@@ -12,13 +12,13 @@ module RuboCop
   module Herb
     # Result structure for transformed ERB nodes
     Result = Data.define(
-      :position,      #: Integer - byte position
-      :tag_opening,   #: String - opening tag ("<%=", "<%", "<%#", or "" for placeholder)
-      :tag_closing,   #: String - closing tag ("%>" or "" for placeholder)
-      :prefix,        #: String - transformed prefix ("_ =" or "   " or "" for placeholder)
-      :content,       #: String - Ruby code with semicolon added
-      :location,      #: ::Herb::Location - location info for same-line checking
-      :node           #: ::Herb::AST::erb_nodes? - original AST node (nil for placeholders)
+      :position,     #: Integer - byte position
+      :tag_opening,  #: String - opening tag ("<%=", "<%", "<%#", or "" for placeholder)
+      :tag_closing,  #: String - closing tag ("%>" or "" for placeholder)
+      :prefix,       #: String - transformed prefix ("_ =" or "   " or "" for placeholder)
+      :content,      #: String - Ruby code with semicolon added
+      :location,     #: ::Herb::Location - location info for same-line checking
+      :node          #: ::Herb::AST::erb_nodes? - original AST node (nil for placeholders)
     )
 
     class Result
