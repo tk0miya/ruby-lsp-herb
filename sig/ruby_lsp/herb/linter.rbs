@@ -16,8 +16,10 @@ module RubyLsp
 
       def initialize: () -> void
 
+      # @rbs node: untyped
       def visit_child_nodes: (untyped node) -> void
 
+      # @rbs node: untyped
       def visit_erb_nodes: (untyped node) -> void
 
       private
