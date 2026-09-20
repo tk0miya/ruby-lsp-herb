@@ -60,7 +60,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with comment on same line as code" do
         let(:source) { "<%# comment %><%= foo %>\n<% bar %>" }
 
-        it "filters out comment when on same line as code" do
+        it "filters out the comment" do
           expect(subject.size).to eq(2)
           expect(subject[0]).to have_attributes(position: 14, code: "_ = foo;")
           expect(subject[1]).to have_attributes(position: 25, code: "   bar;")
@@ -88,7 +88,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with multi-line comment with invalid indentation" do
         let(:source) { "<%# line1\nline2 %>" }
 
-        it "ignores comment when indentation is invalid" do
+        it "ignores the comment" do
           expect(subject.size).to eq(0)
         end
       end
@@ -118,7 +118,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with empty do block without enough space for placeholder" do
         let(:source) { "<% items.each do |item| %>\n<% end %>" }
 
-        it "does not include placeholder when space is insufficient" do
+        it "does not include a placeholder" do
           expect(subject.size).to eq(2)
           placeholder = subject.find { _1.code == "_ = nil;" }
           expect(placeholder).to be_nil
