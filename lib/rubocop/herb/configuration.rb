@@ -7,8 +7,6 @@ module RuboCop
     module Configuration
       DEFAULT_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
 
-      # @rbs self.@supported_extensions: Array[String]
-
       # Cops to exclude from ERB files due to whitespace padding and ERB tag formatting
       EXCLUDED_COPS = [
         "Layout/BlockAlignment",          # Block alignment differs due to ERB tag length differences (<%= vs <%)
@@ -55,11 +53,13 @@ module RuboCop
 
         private
 
-        # attr_reader here would be simpler, but rbs-inline doesn't emit `self.`
-        # for an attr_reader nested inside `class << self`.
-        def supported_extensions #: Array[String] # rubocop:disable Style/TrivialAccessors
-          @supported_extensions
-        end
+        # rbs-inline emits attr_reader as an instance reader regardless of
+        # nesting inside `class << self`, so declare the singleton reader by hand.
+        # @rbs skip
+        attr_reader :supported_extensions #: Array[String]
+
+        # @rbs!
+        #   private attr_reader self.supported_extensions: Array[String]
       end
     end
   end

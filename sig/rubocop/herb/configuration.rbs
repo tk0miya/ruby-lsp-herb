@@ -7,8 +7,6 @@ module RuboCop
     module Configuration
       DEFAULT_EXTENSIONS: Array[String]
 
-      self.@supported_extensions: Array[String]
-
       # Cops to exclude from ERB files due to whitespace padding and ERB tag formatting
       EXCLUDED_COPS: Array[String]
 
@@ -20,9 +18,7 @@ module RuboCop
 
       def self.to_rubocop_config: () -> Hash[String, untyped]
 
-      # attr_reader here would be simpler, but rbs-inline doesn't emit `self.`
-      # for an attr_reader nested inside `class << self`.
-      private def self.supported_extensions: () -> Array[String]
+      private attr_reader self.supported_extensions: Array[String]
     end
   end
 end
