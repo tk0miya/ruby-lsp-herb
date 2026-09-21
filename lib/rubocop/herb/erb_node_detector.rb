@@ -29,7 +29,7 @@ module RuboCop
       # Stop traversal once an ERB node is found.
       # @rbs node: untyped
       def visit(node) #: void
-        return if @found
+        return if found?
 
         super
       end

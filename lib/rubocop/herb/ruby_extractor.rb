@@ -78,12 +78,12 @@ module RuboCop
       def build_processed_source(code) #: RuboCop::ProcessedSource
         RuboCop::ProcessedSource.new(
           code,
-          @processed_source.ruby_version,
-          @processed_source.path,
-          parser_engine: @processed_source.parser_engine
+          processed_source.ruby_version,
+          processed_source.path,
+          parser_engine: processed_source.parser_engine
         ).tap do |source|
-          source.config = @processed_source.config
-          source.registry = @processed_source.registry
+          source.config = processed_source.config
+          source.registry = processed_source.registry
         end
       end
     end

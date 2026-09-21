@@ -19,6 +19,10 @@ module RuboCop
       def self.supported_file?: (String path) -> bool
 
       def self.to_rubocop_config: () -> Hash[String, untyped]
+
+      # attr_reader here would be simpler, but rbs-inline doesn't emit `self.`
+      # for an attr_reader nested inside `class << self`.
+      private def self.supported_extensions: () -> Array[String]
     end
   end
 end
