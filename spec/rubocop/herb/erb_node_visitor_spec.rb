@@ -158,58 +158,48 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
     end
 
     describe "unless node" do
-      context "with simple unless" do
-        let(:source) { "<% unless condition %>\n  content\n<% end %>" }
+      let(:source) { "<% unless condition %>\n  content\n<% end %>" }
 
-        it "collects unless and end nodes" do
-          expect(subject.size).to eq(3)
-          expect(subject[0]).to have_attributes(code: "   unless condition;")
-          expect(subject[2]).to have_attributes(code: "   end;")
-        end
+      it "collects unless and end nodes" do
+        expect(subject.size).to eq(3)
+        expect(subject[0]).to have_attributes(code: "   unless condition;")
+        expect(subject[2]).to have_attributes(code: "   end;")
       end
     end
 
     describe "case/when nodes" do
-      context "with case/when" do
-        let(:source) { "<% case x %>\n<% when 1 %>\n  a\n<% when 2 %>\n  b\n<% end %>" }
+      let(:source) { "<% case x %>\n<% when 1 %>\n  a\n<% when 2 %>\n  b\n<% end %>" }
 
-        it "collects case and `when` nodes" do
-          codes = subject.map(&:code)
-          expect(codes).to eq(["   case x;", "   when 1;", "   when 2;", "   end;"])
-        end
+      it "collects case and `when` nodes" do
+        codes = subject.map(&:code)
+        expect(codes).to eq(["   case x;", "   when 1;", "   when 2;", "   end;"])
       end
     end
 
     describe "while node" do
-      context "with simple while" do
-        let(:source) { "<% while condition %>\n  content\n<% end %>" }
+      let(:source) { "<% while condition %>\n  content\n<% end %>" }
 
-        it "collects while and end nodes" do
-          expect(subject.first).to have_attributes(code: "   while condition;")
-          expect(subject.last).to have_attributes(code: "   end;")
-        end
+      it "collects while and end nodes" do
+        expect(subject.first).to have_attributes(code: "   while condition;")
+        expect(subject.last).to have_attributes(code: "   end;")
       end
     end
 
     describe "until node" do
-      context "with simple until" do
-        let(:source) { "<% until condition %>\n  content\n<% end %>" }
+      let(:source) { "<% until condition %>\n  content\n<% end %>" }
 
-        it "collects until and end nodes" do
-          expect(subject.first).to have_attributes(code: "   until condition;")
-          expect(subject.last).to have_attributes(code: "   end;")
-        end
+      it "collects until and end nodes" do
+        expect(subject.first).to have_attributes(code: "   until condition;")
+        expect(subject.last).to have_attributes(code: "   end;")
       end
     end
 
     describe "for node" do
-      context "with simple for" do
-        let(:source) { "<% for item in items %>\n  content\n<% end %>" }
+      let(:source) { "<% for item in items %>\n  content\n<% end %>" }
 
-        it "collects for and end nodes" do
-          expect(subject.first).to have_attributes(code: "   for item in items;")
-          expect(subject.last).to have_attributes(code: "   end;")
-        end
+      it "collects for and end nodes" do
+        expect(subject.first).to have_attributes(code: "   for item in items;")
+        expect(subject.last).to have_attributes(code: "   end;")
       end
     end
 

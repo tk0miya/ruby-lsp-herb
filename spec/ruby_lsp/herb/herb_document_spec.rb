@@ -69,17 +69,15 @@ RSpec.describe RubyLsp::Herb::HerbDocument do
     end
 
     context "with severity mapping" do
-      context "with error severity offense" do
-        # Lint/Syntax would be error level, but that requires actual syntax error
-        # Most offenses are convention/warning level
-        let(:source) { "<% x = 1 %>" } # Lint/UselessAssignment
+      # Lint/Syntax would be error level, but that requires actual syntax error
+      # Most offenses are convention/warning level
+      let(:source) { "<% x = 1 %>" } # Lint/UselessAssignment
 
-        it "maps non-error offenses to warnings" do
-          document = create_document(source)
-          messages = document.parse_result.warnings.map(&:message)
+      it "maps non-error offenses to warnings" do
+        document = create_document(source)
+        messages = document.parse_result.warnings.map(&:message)
 
-          expect(messages).to include(match(%r{\[Lint/UselessAssignment\]}))
-        end
+        expect(messages).to include(match(%r{\[Lint/UselessAssignment\]}))
       end
     end
 
