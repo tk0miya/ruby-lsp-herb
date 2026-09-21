@@ -7,8 +7,6 @@ module RuboCop
     module Configuration
       DEFAULT_EXTENSIONS = %w[.html.erb].freeze #: Array[String]
 
-      # @rbs self.@supported_extensions: Array[String]
-
       # Cops to exclude from ERB files due to whitespace padding and ERB tag formatting
       EXCLUDED_COPS = [
         "Layout/BlockAlignment",          # Block alignment differs due to ERB tag length differences (<%= vs <%)
@@ -39,12 +37,12 @@ module RuboCop
 
         # @rbs path: String
         def supported_file?(path) #: bool
-          @supported_extensions.any? { path.end_with?(_1) }
+          supported_extensions.any? { path.end_with?(_1) }
         end
 
         def to_rubocop_config #: Hash[String, untyped]
           # Include both relative and absolute path patterns for glob matching
-          globs = @supported_extensions.flat_map { ["**/*#{_1}", "/**/*#{_1}"] }
+          globs = supported_extensions.flat_map { ["**/*#{_1}", "/**/*#{_1}"] }
 
           config = { "AllCops" => { "Include" => globs } }
           EXCLUDED_COPS.each do |cop|
@@ -52,6 +50,16 @@ module RuboCop
           end
           config
         end
+
+        private
+
+        # rbs-inline emits attr_reader as an instance reader regardless of
+        # nesting inside `class << self`, so declare the singleton reader by hand.
+        # @rbs skip
+        attr_reader :supported_extensions #: Array[String]
+
+        # @rbs!
+        #   private attr_reader self.supported_extensions: Array[String]
       end
     end
   end
