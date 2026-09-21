@@ -21,6 +21,8 @@ module RubyLsp
   end
 
   class Server < BaseServer
+    attr_reader global_state: GlobalState
+
     def text_document_diagnostic: (Hash[untyped, untyped]) -> void
   end
 

@@ -10,6 +10,7 @@ gem "rake", "~> 13.4"
 gem "rspec", "~> 3.0"
 
 gem "rubocop", "~> 1.86"
+gem "rubocop-instance_variable_access"
 gem "rubocop-numbered-params"
 gem "rubocop-rake", "~> 0.7.1"
 gem "rubocop-rbs_inline"
