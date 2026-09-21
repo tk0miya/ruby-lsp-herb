@@ -13,17 +13,18 @@ module RubyLsp
       # source code, we don't want to show diagnostics for it
       uri = message.dig(:params, :textDocument, :uri)
       path = uri.to_standardized_path
-      unless path.nil? || path.start_with?(@global_state.workspace_path)
+      unless path.nil? || path.start_with?(global_state.workspace_path)
         send_empty_response(message[:id])
         return
       end
 
-      document = @store.get(uri)
+      # @store is part of RubyLsp::BaseServer's private state and has no reader upstream.
+      document = @store.get(uri) # rubocop:disable Style/InstanceVariableAccess
 
       response = document.cache_fetch("textDocument/diagnostic") do |document|
         case document
         when Herb::HerbDocument, RubyDocument
-          Requests::Diagnostics.new(@global_state, document).perform
+          Requests::Diagnostics.new(global_state, document).perform
         end
       end
 

@@ -5,6 +5,8 @@ module RubyLsp
     alias original_set set
 
     # @rbs override
+    # @state and @global_state are part of RubyLsp::Store's private state and have no reader upstream.
+    # rubocop:disable Style/InstanceVariableAccess
     def set: ...
   end
 end

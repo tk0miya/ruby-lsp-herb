@@ -6,13 +6,15 @@ module RubyLsp
     class HerbDocument[T] < RubyLsp::ERBDocument[T]
       attr_reader parse_result: ::Prism::ParseResult
 
-      @needs_parsing: bool
-
       def parse!: () -> void
 
       def ast: () -> Prism::ProgramNode
 
       def syntax_error?: () -> bool
+
+      private
+
+      attr_reader needs_parsing: bool
     end
   end
 end

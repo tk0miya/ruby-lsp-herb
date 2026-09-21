@@ -12,10 +12,8 @@ module RubyLsp
     class HerbDocument < RubyLsp::ERBDocument #[T]
       attr_reader :parse_result #: ::Prism::ParseResult
 
-      # @rbs @needs_parsing: bool
-
       def parse! #: void # rubocop:disable Naming/PredicateMethod
-        return false unless @needs_parsing
+        return false unless needs_parsing
 
         @needs_parsing = false
         @parse_result = ErbAnalyzer.new(uri, source).analyze.to_prism_parse_result
@@ -35,6 +33,10 @@ module RubyLsp
         # see https://github.com/Shopify/ruby-lsp/blob/main/lib/ruby_lsp/requests/diagnostics.rb
         true
       end
+
+      private
+
+      attr_reader :needs_parsing #: bool
     end
   end
 end
