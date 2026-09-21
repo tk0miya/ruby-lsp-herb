@@ -130,7 +130,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with simple if" do
         let(:source) { "<% if condition %>\n  content\n<% end %>" }
 
-        it "collects if and end nodes with placeholder" do
+        it "collects `if` and end nodes with placeholder" do
           expect(subject.size).to eq(3)
           expect(subject[0]).to have_attributes(code: "   if condition;")
           expect(subject[1]).to have_attributes(code: "_ = nil;")
@@ -141,7 +141,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with if/else" do
         let(:source) { "<% if x %>\n  a\n<% else %>\n  b\n<% end %>" }
 
-        it "collects if, else, and end nodes" do
+        it "collects `if`, else, and end nodes" do
           codes = subject.map(&:code)
           expect(codes).to eq(["   if x;", "   else;", "   end;"])
         end
@@ -173,7 +173,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with case/when" do
         let(:source) { "<% case x %>\n<% when 1 %>\n  a\n<% when 2 %>\n  b\n<% end %>" }
 
-        it "collects case and when nodes" do
+        it "collects case and `when` nodes" do
           codes = subject.map(&:code)
           expect(codes).to eq(["   case x;", "   when 1;", "   when 2;", "   end;"])
         end
@@ -347,7 +347,7 @@ RSpec.describe RuboCop::Herb::ErbNodeVisitor do
       context "with conditional attribute using ERB if" do
         let(:source) { '<div <% if admin? %>class="admin"<% end %>>content</div>' }
 
-        it "skips HTML open tag and extracts ERB if/end" do
+        it "skips HTML open tag and extracts ERB `if`/`end`" do
           expect(subject.size).to eq(4)
           expect(subject[0]).to have_attributes(code: "   if admin?;")
           expect(subject[1]).to have_attributes(code: "_ = nil;") # placeholder
