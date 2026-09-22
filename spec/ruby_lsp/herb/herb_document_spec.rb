@@ -73,7 +73,7 @@ RSpec.describe RubyLsp::Herb::HerbDocument do
       # Most offenses are convention/warning level
       let(:source) { "<% x = 1 %>" } # Lint/UselessAssignment
 
-      it "maps non-error offenses to warnings" do
+      it "maps it to a warning" do
         document = create_document(source)
         messages = document.parse_result.warnings.map(&:message)
 
